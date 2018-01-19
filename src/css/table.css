@@ -1,0 +1,113 @@
+body {
+    font-family: 'RobotoDraft', 'Roboto', 'Helvetica Neue, Helvetica, Arial', sans-serif;
+}
+
+.table {
+    margin: 0 0 40px 0;
+    width: 100%;
+    overflow: auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    display: table;
+    border-left: 1px solid #5353c6;
+    border-right: 1px solid #5353c6;
+    border-bottom: 1px solid #5353c6;
+}
+
+.table > thead > tr > th{
+    font-weight: 500;
+    color: #ffffff;
+    background: #5353c6;
+    border-bottom:none;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    background-color: #adadeb;
+}
+
+.material-icons{
+    font-size:22px;
+    vertical-align: middle;
+}
+
+
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{
+    border-top:none;
+    vertical-align: middle;
+    padding:  6px 12px;
+}
+
+.checkbox label:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.checkbox .cr {
+  position: relative;
+  display: inline-block;
+  border: 1px solid #a9a9a9;
+  border-radius: .25em;
+  width: 1.3em;
+  height: 1.3em;
+  float: left;
+  margin-right: .5em;
+}
+
+.checkbox .cr .cr-icon {
+  position: absolute;
+  font-size: .8em;
+  line-height: 0;
+  top: 50%;
+  left: 20%;
+}
+
+.checkbox label input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox label input[type="checkbox"]+.cr>.cr-icon {
+  opacity: 0;
+}
+
+.checkbox label input[type="checkbox"]:checked+.cr>.cr-icon {
+  opacity: 1;
+}
+
+.checkbox label input[type="checkbox"]:disabled+.cr {
+  opacity: .5;
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+::-webkit-scrollbar-button {
+    width: 0px;
+    height: 0px;
+}
+::-webkit-scrollbar-thumb {
+    background: #5353c6;
+    border: 0px none #333399;
+    border-radius: 84px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #333399;
+}
+::-webkit-scrollbar-thumb:active {
+    background: #333399;
+}
+::-webkit-scrollbar-track {
+    background: #e9ebee;
+    border: 0px none #e9ebee;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-track:hover {
+    background: #e9ebee;
+}
+::-webkit-scrollbar-track:active {
+    background: #e9ebee;
+}
+::-webkit-scrollbar-corner {
+    background: transparent;
+}

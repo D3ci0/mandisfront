@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="mandisfront" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="mandisfront" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="mandisfront" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" ng-app="mandis" class="no-js">
+	<!--<![endif]-->
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Mandis</title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="css/table.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.7.1/angular-local-storage.js"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src='http://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js'></script>
+
+	</head>
+	<body style="background-color: #f6f7f9">
+
+		<!-- Body -->
+		<div class="col-md-12">
+			<nav class="navbar navbar-default navbar-fixed-top">
+				<div class="container">
+					<div id="navbar" class="navbar-collapse collapse" style="float:right;margin-right:15%">
+						<div class="navbar-header">
+							<a class="navbar-brand">Mandis</a>
+						</div>
+						<ul class="nav navbar-nav">
+							<li class="active">
+								<a href="#">Home</a>
+							</li>
+							<li class="dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown">Sorgenti<span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<li>
+										<a href="#">Circolari</a>
+									</li>
+									<li>
+										<a href="#">Lineari</a>
+									</li>
+									<li>
+										<a href="#">Poligonali</a>
+									</li>
+								</ul>
+							</li>
+                        </ul>
+					</div><!--/.nav-collapse -->
+				</div>
+			</nav>
+		</div>
+		<div class="container-fluid float-right" style="margin-top: 40px">
+
+			<!-- Google Map -->
+			<div class="col-md-7 " >
+				<div id="map" style="height:96vh; margin-left:-28px"></div>
+			</div>
+			<!-- Google Map ends -->
+
+			<div class="col-md-5">
+				<div class="row" style="margin-top:15px">
+					<div class="default-nav-wrapper col-md-8 col-xs-12">
+						<div id="site-navigation">
+							<div id="nav-container">
+								<div class="menu-primary-container">
+
+									<ul class="menu nav-menu" id="menu-primary">
+										<li>
+											<a href="#">Area</a>
+										</li>
+										<li>
+											<a href="#">Sorgente</a>
+										</li>
+										<li class="active">
+											<a href="#">Diagnosi</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="slider-wrapper"></div>
+				</div>
+			</div>
+			<form id="ricerca_sorgenti" method="post">
+				<div class="col-md-5" style="margin-top: 20px">
+					<fieldset>
+					<legend>
+						Ricerca sorgenti
+					</legend>
+					</fieldset>
+				</div>
+				<div ng-app = "mandis" ng-controller = "diagnosi_controller" id="diagnosi_ctrl">
+					<div class="col-md-4 form-group" style="margin-top: 20px" >
+						<div class="row">
+							<label class="col-md-2 control-label">Distanza(Km)</label>
+						</div>
+						<div class="row inputGroupContainer">
+							<div class="col-md-6">
+								<div class="input-group">
+									<input type =_"text" class="form-control" name="distanza" id="select_distanza" ng-model="data.distanza">
+									</input>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-5" style="margin-top: 20px">
+						<fieldset>
+						<legend>
+							Lista diagnosi
+						</legend>
+						</fieldset>
+							<div style="margin-top: 20px">
+								<table id="diagnosi_tab" class="table table-sm table-hover">
+									<thead class="thead">
+										<tr>
+											<th>Id</th>
+											<th>Patologia</th>
+											<th>Data</th>
+											<th>Cerca</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="x in diagnosi">
+											<td>{{x.properties.pk}}</td>
+											<td>{{x.properties.patologia}}</td>
+											<td>{{x.properties.data_diagnosi | date:'dd/MM/yyyy'}}</td>
+											<td>
+											<button style="outline:none;background:none;border:none" ng-click="search(x.geometry.coordinates, x.properties)">
+												<i class="glyphicon glyphicon-search"></i>
+											</button></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+					</div>
+				</div>
+			</form>
+        </div>
+	</body>
+
+	<script>
+		var app = angular.module('mandis', ['LocalStorageModule']);
+
+		//diagnosi controller begins
+		app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
+
+			$http.get("http://127.0.0.1:8000/diagnosi/").then(function(response) {
+				$scope.diagnosi = JSON.parse(response.data).features;
+			});
+
+			$scope.search = function(to_search, properties) {
+				var json = {
+					'distanza' : Number(document.getElementById('select_distanza').value),
+					'point' : to_search
+				};
+
+				$http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_diagnosi/", json).then(function(response) {
+					var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
+					$scope.response = response.data;
+					localStorage.setItem('geojson_srcfound', response.data);
+					localStorage.setItem('residenza_paziente', to_search);
+					localStorage.setItem('diagnosi_data', data);
+					localStorage.setItem('diagnosi_patologia', properties.patologia);
+					$window.location.href = '/mandis/src/sorgenti_trovate.html';
+				}, function(err) {
+					alert(err);
+				});
+			};
+		});
+		//diagnosi controller ends
+	</script>
+
+	<script>
+		var arrMarkers = new Array();
+		var map;
+
+		function initMap() {
+			map = new google.maps.Map(document.getElementById('map'), {
+				center : {
+					lat : 41.066927730193456,
+					lng : 14.330291748046875
+				},
+				zoom : 9 // Center the map on Rome, Italy.
+			});
+		}
+
+		$.ajax({
+			type : "GET",
+			dataType : "json",
+			url : "http://127.0.0.1:8000/sorgenti/",
+			success : function(data) {
+				map.data.addGeoJson(JSON.parse(data));
+				map.data.setStyle(function() {
+					return ( {
+						fillColor : "red",
+						fillOpacity : 0.25
+					});
+				});
+			}
+		});
+
+		$.ajax({
+			type : "GET",
+			dataType : "json",
+			url : "http://127.0.0.1:8000/diagnosi/",
+			success : function(data) {
+				map.data.addGeoJson(JSON.parse(data));
+			}
+		});
+
+	</script>
+	<script>
+		$(document).ready(function() {
+			$('#ricerca_sorgenti').bootstrapValidator({
+				feedbackIcons : {
+					valid : 'glyphicon glyphicon-ok',
+					invalid : 'glyphicon glyphicon-remove',
+					validating : 'glyphicon glyphicon-refresh'
+				},
+				fields : {
+					distanza : {
+						validators : {
+							notEmpty : {
+								message : 'Inserisci la distanza'
+							},
+							numeric : {
+								message : 'Distanza non valida'
+							}
+						}
+					}
+				}
+			});
+		});
+	</script>
+	<script>
+		$(document).ready(function() {
+			var tab = $('#diagnosi_tab').DataTable({
+				"scrollY" : "500px",
+				"order" : [],
+				"columns" : [{
+					"name" : "Id",
+					"orderable" : true
+				}, {
+					"name" : "Patologia",
+					"orderable" : true
+				}, {
+					"name" : "Data",
+					"orderable" : true
+				}, {
+					"name" : "Cerca",
+					"orderable" : false
+				}],
+				"scrollCollapse" : true,
+				"paging" : false,
+				"sDom" : '<"top"i>rt<"bottom"flp><"clear">',
+				"searching" : false,
+				"info" : false,
+				"fnInitComplete" : function() {
+					this.fnAdjustColumnSizing();
+				}
+			});
+		});
+	</script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&callback=initMap"></script>
+</html>
