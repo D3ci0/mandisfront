@@ -10,7 +10,7 @@
 .slider-wrapper {
   margin: auto;
   margin-bottom: 10px;
-  margin-top: 44px;
+  margin-top: 0px;
   border-top: solid 1px #cccccc;
   border-bottom: none;
 
@@ -73,3 +73,12 @@
   padding-bottom: 13px;
   color: #333399;
  }
+
+.glyphicon.glyphicon-search{
+    top: 2px;
+    left: 2px;
+}
+
+.btn.btn-primary {
+    background-color: #5353c6;
+}

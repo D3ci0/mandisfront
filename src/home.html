@@ -75,7 +75,7 @@
 
 									<ul class="menu nav-menu" id="menu-primary">
 										<li>
-											<a href="#">Area</a>
+											<a href="home-area.html">Area</a>
 										</li>
 										<li>
 											<a href="#">Sorgente</a>
@@ -88,9 +88,16 @@
 							</div>
 						</div>
 					</div>
-					<div class="slider-wrapper"></div>
 				</div>
+                <div class="slider-wrapper"></div>
 			</div>
+
+            <div class="col-md-5">
+                <div class="alert alert-info">
+                    <strong>Info!</strong> Spiegare come funziona la ricerca.
+                </div>
+            </div>
+
 			<form id="ricerca_sorgenti" method="post">
 				<div class="col-md-5" style="margin-top: 20px">
 					<fieldset>
@@ -171,7 +178,7 @@
 					localStorage.setItem('residenza_paziente', to_search);
 					localStorage.setItem('diagnosi_data', data);
 					localStorage.setItem('diagnosi_patologia', properties.patologia);
-					$window.location.href = '/mandis/src/sorgenti_trovate.html';
+					$window.location.href = '/mandisfront/src/sorgenti_trovate.html';
 				}, function(err) {
 					alert(err);
 				});

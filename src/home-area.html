@@ -74,25 +74,33 @@
                         <div class="menu-primary-container">
 
                             <ul class="menu nav-menu" id="menu-primary">
-                                <li>
+                                <li class="active">
                                     <a href="#">Area</a>
                                 </li>
                                 <li>
                                     <a href="#">Sorgente</a>
                                 </li>
-                                <li class="active">
-                                    <a href="#">Diagnosi</a>
+                                <li>
+                                    <a href="home.html">Diagnosi</a>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="slider-wrapper"></div>
+
+        </div>
+        <div class="slider-wrapper"></div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="alert alert-info">
+            <strong>Info!</strong> Spiegare come funziona la ricerca.
         </div>
     </div>
+
     <form id="ricerca_sorgenti" method="post">
-        <div class="col-md-5" style="margin-top: 20px">
+        <div class="col-md-5">
             <fieldset>
             <legend>
                 Ricerca sorgenti
@@ -100,21 +108,17 @@
             </fieldset>
         </div>
         <div ng-app = "mandis" ng-controller = "diagnosi_controller" id="diagnosi_ctrl">
-            <div class="col-md-4 form-group" style="margin-top: 20px" >
-                    <div class="row">
-                        <label class="col-md-2 control-label">Distanza(Km)</label>
-                    </div>
-                <div class="row inputGroupContainer">
-                    <div class="col-md-4">
-                        <input type =_"text" class="form-control" name="distanza" id="select_distanza" ng-model="data.distanza">
-                        </input>
-                    </div>
-                    <button style="outline:none;background:none;border:none;margin-top:5px" ng-click="search(x.geometry.coordinates, x.properties)">
-                        <i class="glyphicon glyphicon-search" ></i>
-                    </button>
-                </div>
+            <div class="col-md-4 form-group">
+                <button class="btn btn-primary"  ng-click="search()">
+                    Cerca
+                    <i class="glyphicon glyphicon-search"> </i>
+                </button>
+                <button class="btn btn-danger"  ng-click="reset()">
+                    Reset
+                    <i class="glyphicon glyphicon-repeat"> </i>
+                </button>
             </div>
-            <div class="col-md-5" style="margin-top: 20px">
+            <div class="col-md-5">
                 <fieldset>
                 <legend>
                     Lista diagnosi
@@ -125,7 +129,7 @@
                         <thead class="thead">
                         <tr>
                             <th>Patologia</th>
-                            <th>Data</th>
+                            <th>Frequenza</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -135,6 +139,16 @@
                         </tr>
                         </tbody>
                     </table>
+                </div>
+                <div style="margin-top: 20px">
+                <fieldset>
+                    <legend>
+                        Sorgenti di inquinamento
+                    </legend>
+                </fieldset>
+                <div class="alert alert-success">
+                    <strong>Le sorgenti di inquinamento più vicine all'area idicata sono state evidenziate sulla mappa.</strong>
+                </div>
                 </div>
             </div>
         </div>
@@ -148,11 +162,7 @@
     //diagnosi controller begins
     app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
 
-        $scope.search = function(to_search, properties) {
-            var json = {
-                'distanza' : Number(document.getElementById('select_distanza').value),
-                'geoJson' : localStorage.getItem('geoJson')
-            };
+        $scope.search = function() {
             $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", localStorage.getItem('geoJson')).then(function(response) {
                 //var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
                 $scope.diagnosi= JSON.parse(response.data);
