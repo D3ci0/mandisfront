@@ -109,22 +109,26 @@
         </div>
         <div ng-app = "mandis" ng-controller = "diagnosi_controller" id="diagnosi_ctrl">
             <div class="col-md-4 form-group">
-                <button class="btn btn-primary"  ng-click="search()">
+                <button id="search_btn" class="btn btn-primary"  ng-click="search()">
                     Cerca
                     <i class="glyphicon glyphicon-search"> </i>
                 </button>
-                <button class="btn btn-danger"  ng-click="reset()">
+                <button id="reset_btn" class="btn btn-danger"  ng-click="reset()">
                     Reset
                     <i class="glyphicon glyphicon-repeat"> </i>
                 </button>
             </div>
             <div class="col-md-5">
-                <fieldset>
-                <legend>
-                    Lista diagnosi
-                </legend>
-                </fieldset>
-                <div style="margin-top: 20px">
+
+                <!-- Tabella diagnosi -->
+
+                <div class="col-md-7" style="margin-left: -15px ">
+                    <fieldset>
+                        <legend>
+                            Diagnosi
+                        </legend>
+                    </fieldset>
+
                     <table id="diagnosi_tab" class="table table-sm table-hover">
                         <thead class="thead">
                         <tr>
@@ -140,16 +144,29 @@
                         </tbody>
                     </table>
                 </div>
-                <div style="margin-top: 20px">
-                <fieldset>
-                    <legend>
-                        Sorgenti di inquinamento
-                    </legend>
-                </fieldset>
-                <div class="alert alert-success">
-                    <strong>Le sorgenti di inquinamento più vicine all'area idicata sono state evidenziate sulla mappa.</strong>
+
+                <!-- Tabella sorgenti -->
+                <div class="col-md-5" style = "margin-left: 15px">
+                    <fieldset>
+                        <legend>
+                            Sorgenti
+                        </legend>
+                    </fieldset>
+
+                    <table id="sorgenti_tab" class="table table-sm table-hover">
+                        <thead class="thead">
+                        <tr>
+                            <th>Distanza</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="x in sorgenti">
+                            <td>{{x.properties.distanza}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-                </div>
+
             </div>
         </div>
     </form>
@@ -157,28 +174,12 @@
 </body>
 
 <script>
-    var app = angular.module('mandis', ['LocalStorageModule']);
-
-    //diagnosi controller begins
-    app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
-
-        $scope.search = function() {
-            $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", localStorage.getItem('geoJson')).then(function(response) {
-                //var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
-                $scope.diagnosi= JSON.parse(response.data);
-            }, function(err) {
-                alert(err);
-            });
-        };
-    });
-    //diagnosi controller ends
-</script>
-
-<script>
     var shapes = [];
     var circle;
     var arrMarkers = new Array();
     var map;
+    var polygon_overlay=null;
+    var drawingManager=null;
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -186,10 +187,10 @@
                 lat: 41.066927730193456,
                 lng: 14.330291748046875
             },
-            zoom: 9 // Center the map on Rome, Italy.
+            zoom: 9
         });
 
-        var drawingManager = new google.maps.drawing.DrawingManager({
+        drawingManager = new google.maps.drawing.DrawingManager({
             drawingMode: google.maps.drawing.OverlayType.POLYGON,
             drawingControl: true,
             drawingControlOptions: {
@@ -229,7 +230,6 @@
             shapes.push(newShape);
             geoJson = exportGeoJson(newShape);
             localStorage.setItem('geoJson', JSON.stringify(geoJson));
-            console.log(JSON.stringify(geoJson));
             if (drawingManager.getDrawingMode()) {
                 drawingManager.setDrawingMode(null);
             }
@@ -264,6 +264,27 @@
         }
     });
 
+    $("#search_btn").click(function(){
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            data: localStorage.getItem('geoJson'),
+            url : "http://127.0.0.1:8000/ricerca_sorgenti_per_area/",
+            success : function(data) {
+                polygon_overlay = new google.maps.Data(map);
+                polygon_overlay.setMap(map);
+                polygon_overlay.addGeoJson(JSON.parse(data));
+                polygon_overlay.setStyle(function() {
+                    return ( {
+                        fillColor : "blue",
+                        fillOpacity : 0.25
+                    });
+                });
+            return data;
+            }
+        });
+    });
+
     $.ajax({
         type : "GET",
         dataType : "json",
@@ -276,6 +297,33 @@
 </script>
 
 <script>
+    var app = angular.module('mandis', ['LocalStorageModule']);
+
+    //diagnosi controller begins
+    app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
+
+        $scope.search = function() {
+            //Query diagnosi nell'area indicata sulla mappa
+            $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", localStorage.getItem('geoJson')).then(function(response) {
+                //var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
+                $scope.diagnosi = JSON.parse(response.data);
+            }, function(err) {
+                alert(err);
+            });
+
+            //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
+            $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_area/", localStorage.getItem('geoJson')).then(function(response) {
+                console.log(JSON.parse(response.data).features);
+                $scope.sorgenti = JSON.parse(response.data).features;
+            }, function(err) {
+                alert(err);
+            });
+        };
+    });
+    //diagnosi controller ends
+</script>
+
+<script>
     $(document).ready(function() {
         var tab = $('#diagnosi_tab').DataTable({
             "scrollY" : "500px",
@@ -283,11 +331,29 @@
             "columns" : [
             {
                 "name" : "Patologia",
-                "orderable" : true
+                "orderable" : false
             }, {
                 "name" : "Frequenza",
-                "orderable" : true
+                "orderable" : false
             }],
+            "scrollCollapse" : true,
+            "paging" : false,
+            "sDom" : '<"top"i>rt<"bottom"flp><"clear">',
+            "searching" : false,
+            "info" : false,
+            "fnInitComplete" : function() {
+                this.fnAdjustColumnSizing();
+            }
+        });
+
+        var sorgenti_tab = $('#sorgenti_tab').DataTable({
+            "scrollY" : "500px",
+            "order" : [],
+            "columns" : [
+                {
+                    "name" : "Distanza",
+                    "orderable" : false
+                }],
             "scrollCollapse" : true,
             "paging" : false,
             "sDom" : '<"top"i>rt<"bottom"flp><"clear">',
@@ -370,6 +436,35 @@
         return geoJson;
     }
 
+</script>
+
+<script>
+
+    $('#reset_btn').click(function(){
+        //Reset della tabella delle diagnosi trovate
+        var data_table= $('#diagnosi_tab').DataTable();
+        data_table.clear();
+        data_table.draw();
+
+        //Reset della tabella delle sorgenti trovate
+        var data_table_sorgenti= $('#sorgenti_tab').DataTable();
+        data_table_sorgenti.clear();
+        data_table_sorgenti.draw();
+
+        //Reset delle sorgenti di inquinamento più vicine all'area indicata sulla mappa
+        if(polygon_overlay!=null){
+            polygon_overlay.setMap(null);
+        }
+
+        //Reset dell'area disegnata tramite drawing manager di Google Maps
+        for (var i = 0; i < shapes.length; i++) {
+            shapes[i].setMap(null);
+        }
+        shapes = [];
+        localStorage.removeItem('geoJson');
+
+
+    });
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&libraries=drawing&callback=initMap"></script>
 </html>
