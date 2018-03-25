@@ -113,7 +113,7 @@
                     Cerca
                     <i class="glyphicon glyphicon-search"> </i>
                 </button>
-                <button id="reset_btn" class="btn btn-danger"  ng-click="reset()">
+                <button id="reset_btn" class="btn btn-danger" onclick="reset_search()">
                     Reset
                     <i class="glyphicon glyphicon-repeat"> </i>
                 </button>
@@ -122,7 +122,7 @@
 
                 <!-- Tabella diagnosi -->
 
-                <div class="col-md-7" style="margin-left: -15px ">
+                <div class="col-md-5" style="margin-left: -15px ">
                     <fieldset>
                         <legend>
                             Diagnosi
@@ -146,7 +146,7 @@
                 </div>
 
                 <!-- Tabella sorgenti -->
-                <div class="col-md-5" style = "margin-left: 15px">
+                <div class="col-md-7" style = "margin-left: 15px">
                     <fieldset>
                         <legend>
                             Sorgenti
@@ -157,11 +157,15 @@
                         <thead class="thead">
                         <tr>
                             <th>Distanza</th>
+                            <th>Data Inizio</th>
+                            <th>Data Fine</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="x in sorgenti">
+                        <tr ng-repeat="x in sorgenti"  ng-click="evidenzia_poligono(x)">
                             <td>{{x.properties.distanza}}</td>
+                            <td>{{x.properties.data_inizio | date:"dd/MM/yyyy"}}</td>
+                            <td>{{x.properties.data_fine | date:"dd/MM/yyyy"}}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -176,7 +180,6 @@
 <script>
     var shapes = [];
     var circle;
-    var arrMarkers = new Array();
     var map;
     var polygon_overlay=null;
     var drawingManager=null;
@@ -244,6 +247,8 @@
                 }
                 shapes = [];
                 localStorage.removeItem('geoJson');
+                if(polygon_overlay!=null)
+                    polygon_overlay.setMap(null);
             }
         });
 
@@ -264,13 +269,26 @@
         }
     });
 
-    $("#search_btn").click(function(){
+    function diagnosi_per_area(){
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            data: localStorage.getItem('geoJson'),
+            url : "http://127.0.0.1:8000/ricerca_malattie_per_area/",
+            success : function(data) {
+                localStorage.setItem('diagnosi_per_area', data);
+            }
+        });
+    }
+
+    function sorgenti_per_area(){
         $.ajax({
             type : "POST",
             dataType : "json",
             data: localStorage.getItem('geoJson'),
             url : "http://127.0.0.1:8000/ricerca_sorgenti_per_area/",
             success : function(data) {
+                localStorage.setItem('sorgenti_per_area', JSON.stringify(data));
                 polygon_overlay = new google.maps.Data(map);
                 polygon_overlay.setMap(map);
                 polygon_overlay.addGeoJson(JSON.parse(data));
@@ -280,10 +298,9 @@
                         fillOpacity : 0.25
                     });
                 });
-            return data;
             }
         });
-    });
+    };
 
     $.ajax({
         type : "GET",
@@ -304,21 +321,20 @@
 
         $scope.search = function() {
             //Query diagnosi nell'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", localStorage.getItem('geoJson')).then(function(response) {
-                //var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
-                $scope.diagnosi = JSON.parse(response.data);
-            }, function(err) {
-                alert(err);
-            });
+            diagnosi_per_area();
+            diagnosi = JSON.parse(localStorage.getItem('diagnosi_per_area'));
+            $scope.diagnosi = diagnosi;
 
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_area/", localStorage.getItem('geoJson')).then(function(response) {
-                console.log(JSON.parse(response.data).features);
-                $scope.sorgenti = JSON.parse(response.data).features;
-            }, function(err) {
-                alert(err);
-            });
+            sorgenti_per_area();
+            sorgenti = JSON.parse(localStorage.getItem('sorgenti_per_area'));
+            $scope.sorgenti = JSON.parse(sorgenti).features;
+
         };
+
+        $scope.evidenzia_poligono = function(tmp){
+            poly_clicked(tmp);
+        }
     });
     //diagnosi controller ends
 </script>
@@ -352,6 +368,12 @@
             "columns" : [
                 {
                     "name" : "Distanza",
+                    "orderable" : false
+                },{
+                    "name" : "Data Inizio",
+                    "orderable" : false
+                }, {
+                    "name" : "Data Fine",
                     "orderable" : false
                 }],
             "scrollCollapse" : true,
@@ -439,8 +461,9 @@
 </script>
 
 <script>
+var polygon_clicked_overlay=null;
 
-    $('#reset_btn').click(function(){
+    function reset_search(){
         //Reset della tabella delle diagnosi trovate
         var data_table= $('#diagnosi_tab').DataTable();
         data_table.clear();
@@ -456,15 +479,45 @@
             polygon_overlay.setMap(null);
         }
 
+        //Reset delle sorgenti selezionate dalla tabella
+        if(polygon_clicked_overlay!=null){
+            polygon_clicked_overlay.setMap(null);
+        }
+
         //Reset dell'area disegnata tramite drawing manager di Google Maps
         for (var i = 0; i < shapes.length; i++) {
             shapes[i].setMap(null);
         }
         shapes = [];
         localStorage.removeItem('geoJson');
+    };
 
+    //Evidenzia sulla mappa la sorgente relativa alla riga della tabella sorgenti cliccata
+    function poly_clicked(poly){
+        var latlng=null;
+        if(polygon_clicked_overlay!=null){
+            polygon_clicked_overlay.setMap(null);
+        }
+        polygon_clicked_overlay = new google.maps.Data(map);
+        polygon_clicked_overlay.setMap(map);
+        polygon_clicked_overlay.addGeoJson(poly);
+        polygon_clicked_overlay.setStyle(function() {
+            return ( {
+                fillColor : "yellow",
+                fillOpacity : 0.5,
+                strokeColor: "yellow"
+            });
+        });
 
-    });
+        //Prende il primo punto del geometry. Su questo verrà centrata la mappa
+        if(poly.geometry.type == 'LineString'){
+            latlng = new google.maps.LatLng(poly.geometry.coordinates[0][1], poly.geometry.coordinates[0][0])
+        }
+        if(poly.geometry.type == 'Polygon'){
+            latlng = new google.maps.LatLng(poly.geometry.coordinates[0][0][1], poly.geometry.coordinates[0][0][0])
+        }
+        map.setCenter(latlng);
+    }
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&libraries=drawing&callback=initMap"></script>
 </html>

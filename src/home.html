@@ -99,7 +99,7 @@
             </div>
 
 			<form id="ricerca_sorgenti" method="post">
-				<div class="col-md-5" style="margin-top: 20px">
+				<div class="col-md-5">
 					<fieldset>
 					<legend>
 						Ricerca sorgenti
@@ -107,7 +107,7 @@
 					</fieldset>
 				</div>
 				<div ng-app = "mandis" ng-controller = "diagnosi_controller" id="diagnosi_ctrl">
-					<div class="col-md-4 form-group" style="margin-top: 20px" >
+					<div class="col-md-4 form-group">
 						<div class="row">
 							<label class="col-md-2 control-label">Distanza(Km)</label>
 						</div>
@@ -120,13 +120,13 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-md-5" style="margin-top: 20px">
+					<div class="col-md-5">
 						<fieldset>
 						<legend>
 							Lista diagnosi
 						</legend>
 						</fieldset>
-							<div style="margin-top: 20px">
+							<div>
 								<table id="diagnosi_tab" class="table table-sm table-hover">
 									<thead class="thead">
 										<tr>
@@ -137,7 +137,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr ng-repeat="x in diagnosi">
+										<tr ng-repeat="x in diagnosi" ng-click="evidenzia_marker(x)">
 											<td>{{x.properties.pk}}</td>
 											<td>{{x.properties.patologia}}</td>
 											<td>{{x.properties.data_diagnosi | date:'dd/MM/yyyy'}}</td>
@@ -183,12 +183,15 @@
 					alert(err);
 				});
 			};
+
+			$scope.evidenzia_marker= function(tmp){
+			    diagnosi_clicked(tmp);
+            }
 		});
 		//diagnosi controller ends
 	</script>
 
 	<script>
-		var arrMarkers = new Array();
 		var map;
 
 		function initMap() {
@@ -221,12 +224,14 @@
 			dataType : "json",
 			url : "http://127.0.0.1:8000/diagnosi/",
 			success : function(data) {
-				map.data.addGeoJson(JSON.parse(data));
+				marker_added = map.data.addGeoJson(JSON.parse(data));
 			}
 		});
 
 	</script>
 	<script>
+        diagnosi_clicked_overlay = null;
+
 		$(document).ready(function() {
 			$('#ricerca_sorgenti').bootstrapValidator({
 				feedbackIcons : {
@@ -248,8 +253,42 @@
 				}
 			});
 		});
-	</script>
-	<script>
+
+		function diagnosi_clicked(diagnosi){
+            if(diagnosi_clicked_overlay != null){
+                diagnosi_clicked_overlay.setMap(null);
+            }
+            diagnosi_clicked_overlay = new google.maps.Data(map);
+            diagnosi_clicked_overlay.setMap(map);
+            diagnosi_clicked_overlay.addGeoJson(diagnosi);
+
+            var icon = {
+                url: 'https://cdn.pixabay.com/photo/2014/04/03/00/36/pin-308802_960_720.png',
+                //scaledSize: new google.maps.Size(40, 40),
+            };
+
+            diagnosi_clicked_overlay.setStyle(function() {
+                return ( {
+                    icon: icon,
+                });
+            });
+            /*var i=0;
+            found=false;
+
+
+            while (i<marker_added.length && found==false){
+                if(marker_added[i].getGeometry().get().equals(latlng)){
+                    found=true;
+                    marker_added[i].setProperty('icon', 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+                    console.log(i);
+                }
+                i++;
+            }*/
+            latlng = new google.maps.LatLng(diagnosi.geometry.coordinates[1], diagnosi.geometry.coordinates[0]);
+
+            map.setCenter(latlng);
+        }
+
 		$(document).ready(function() {
 			var tab = $('#diagnosi_tab').DataTable({
 				"scrollY" : "500px",
