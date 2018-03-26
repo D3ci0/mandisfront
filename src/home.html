@@ -161,9 +161,8 @@
 		//diagnosi controller begins
 		app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
 
-			$http.get("http://127.0.0.1:8000/diagnosi/").then(function(response) {
-				$scope.diagnosi = JSON.parse(response.data).features;
-			});
+			diagnosi = JSON.parse(localStorage.getItem('lista_diagnosi'));
+			$scope.diagnosi = diagnosi.features;
 
 			$scope.search = function(to_search, properties) {
 				var json = {
@@ -224,6 +223,7 @@
 			dataType : "json",
 			url : "http://127.0.0.1:8000/diagnosi/",
 			success : function(data) {
+			    localStorage.setItem('lista_diagnosi', data);
 				marker_added = map.data.addGeoJson(JSON.parse(data));
 			}
 		});
@@ -263,27 +263,16 @@
             diagnosi_clicked_overlay.addGeoJson(diagnosi);
 
             var icon = {
-                url: 'https://cdn.pixabay.com/photo/2014/04/03/00/36/pin-308802_960_720.png',
-                //scaledSize: new google.maps.Size(40, 40),
+                url: 'http://www.clker.com/cliparts/R/g/O/v/U/h/google-maps-marker-for-residencelamontagne-md.png',
+                scaledSize: new google.maps.Size(30, 50),
             };
 
             diagnosi_clicked_overlay.setStyle(function() {
                 return ( {
-                    icon: icon,
+                    icon: icon
                 });
             });
-            /*var i=0;
-            found=false;
 
-
-            while (i<marker_added.length && found==false){
-                if(marker_added[i].getGeometry().get().equals(latlng)){
-                    found=true;
-                    marker_added[i].setProperty('icon', 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
-                    console.log(i);
-                }
-                i++;
-            }*/
             latlng = new google.maps.LatLng(diagnosi.geometry.coordinates[1], diagnosi.geometry.coordinates[0]);
 
             map.setCenter(latlng);

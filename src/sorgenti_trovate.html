@@ -20,7 +20,7 @@
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 		<!-- Latest compiled and minified JavaScript -->
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.JSON.parse(response.data)7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 		<script src='http://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js'></script>
 
 	</head>
@@ -87,7 +87,7 @@
 					<input class="form-check-input" type="checkbox" name="checkbox_p" id="ch_p" onchange="poligonali_func(this)" checked="">
 					Poligonali</label>
 			</div>
-			<div class="col-md-5" style="margin-top: 25px">
+			<div class="col-md-5" style="margin-top: 20px">
 				<fieldset>
 				<legend>
 					Diagnosi scelta
@@ -109,6 +109,15 @@
 							<h2 id="data_info"> </h2>
 						</div>
 					</div>
+                <fieldset style = "margin-top: 25px">
+                    <legend>
+
+                    </legend>
+                </fieldset>
+                <button id="indietro_btn" class="btn btn-primary" onclick="go_back()">
+                    Indietro
+                    <i class="glyphicon glyphicon-arrow-left"> </i>
+                </button>
 			</div>
         </div>
 	</body>
@@ -128,15 +137,20 @@
 			});
 
 			features = map.data.addGeoJson(JSON.parse(localStorage.getItem('geojson_srcfound')));
-			console.log(features);
 			point = localStorage.getItem('residenza_paziente').split(',');
+
+            var icon = {
+                url: 'http://www.clker.com/cliparts/R/g/O/v/U/h/google-maps-marker-for-residencelamontagne-md.png',
+                scaledSize: new google.maps.Size(30, 50),
+            };
+
 			new google.maps.Marker({
 				map : map,
 				position : {
 					lat : Number(point[1]),
 					lng : Number(point[0])
 				},
-				icon : 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+				icon : icon
 			});
 
 			map.data.setStyle(function() {
@@ -146,6 +160,10 @@
 				});
 			});
 		}
+
+		function go_back(){
+            location.href = '/mandisfront/src/home.html'
+        }
 
 		function circolari_func(checkbox_c) {
 			if (checkbox_c.checked) {
