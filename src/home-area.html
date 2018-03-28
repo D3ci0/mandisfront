@@ -153,20 +153,20 @@
                         </legend>
                     </fieldset>
 
-                    <table id="sorgenti_tab" class="table table-sm table-hover">
+                    <table id="sorgenti_tab" class="table table-hover">
                         <thead class="thead">
-                        <tr>
-                            <th>Distanza</th>
-                            <th>Data Inizio</th>
-                            <th>Data Fine</th>
-                        </tr>
+                            <tr>
+                                <th>Distanza</th>
+                                <th>Data Inizio</th>
+                                <th>Data Fine</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="x in sorgenti"  ng-click="evidenzia_poligono(x)">
-                            <td>{{x.properties.distanza}}</td>
-                            <td>{{x.properties.data_inizio | date:"dd/MM/yyyy"}}</td>
-                            <td>{{x.properties.data_fine | date:"dd/MM/yyyy"}}</td>
-                        </tr>
+                            <tr ng-repeat="x in sorgenti"  ng-click="evidenzia_poligono(x)">
+                                <td>{{x.properties.distanza}}</td>
+                                <td>{{x.properties.data_inizio | date:"dd/MM/yyyy"}}</td>
+                                <td>{{x.properties.data_fine | date:"dd/MM/yyyy"}}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -183,6 +183,7 @@
     var map;
     var polygon_overlay=null;
     var drawingManager=null;
+    var geoJson=null;
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -231,26 +232,67 @@
             var newShape = event.overlay;
             newShape.type = event.type;
             shapes.push(newShape);
+            addEditListener(newShape);
             geoJson = exportGeoJson(newShape);
             localStorage.setItem('geoJson', JSON.stringify(geoJson));
             if (drawingManager.getDrawingMode()) {
                 drawingManager.setDrawingMode(null);
             }
-
         });
+
+        //Add a listener for circle radius change
+        function addEditListener(shape){
+            newShape = shape;
+            switch (newShape.type){
+                case google.maps.drawing.OverlayType.CIRCLE: {
+                    newShape.addListener("radius_changed", function(){
+                        geoJson = exportGeoJson(newShape);
+                        localStorage.removeItem('geoJson');
+                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                    });
+
+                    newShape.addListener("center_changed", function(){
+                        geoJson = exportGeoJson(newShape);
+                        localStorage.removeItem('geoJson');
+                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                    });
+                    break;
+                }
+
+                case google.maps.drawing.OverlayType.RECTANGLE: {
+                    newShape.addListener("bounds_changed", function(){
+                        geoJson = exportGeoJson(newShape);
+                        localStorage.removeItem('geoJson');
+                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                    });
+                    break;
+                }
+
+                case google.maps.drawing.OverlayType.POLYGON: {
+                    newShape.getPath().addListener("set_at", function(){
+                        geoJson = exportGeoJson(newShape);
+                        localStorage.removeItem('geoJson');
+                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                    });
+
+                    newShape.getPath().addListener("insert_at", function(){
+                        geoJson = exportGeoJson(newShape);
+                        localStorage.removeItem('geoJson');
+                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                    });
+                    break;
+                }
+            }
+            localStorage.setItem('geoJson', JSON.stringify(geoJson));
+        };
 
         // add a listener for the drawing mode change event, delete any existing polygons
         google.maps.event.addListener(drawingManager, "drawingmode_changed", function () {
             if (drawingManager.getDrawingMode() != null) {
-                for (var i = 0; i < shapes.length; i++) {
-                    shapes[i].setMap(null);
-                }
-                shapes = [];
-                localStorage.removeItem('geoJson');
-                if(polygon_overlay!=null)
-                    polygon_overlay.setMap(null);
+                reset_search();
             }
         });
+
 
     }
 
@@ -269,38 +311,7 @@
         }
     });
 
-    function diagnosi_per_area(){
-        $.ajax({
-            type : "POST",
-            dataType : "json",
-            data: localStorage.getItem('geoJson'),
-            url : "http://127.0.0.1:8000/ricerca_malattie_per_area/",
-            success : function(data) {
-                localStorage.setItem('diagnosi_per_area', data);
-            }
-        });
-    }
 
-    function sorgenti_per_area(){
-        $.ajax({
-            type : "POST",
-            dataType : "json",
-            data: localStorage.getItem('geoJson'),
-            url : "http://127.0.0.1:8000/ricerca_sorgenti_per_area/",
-            success : function(data) {
-                localStorage.setItem('sorgenti_per_area', JSON.stringify(data));
-                polygon_overlay = new google.maps.Data(map);
-                polygon_overlay.setMap(map);
-                polygon_overlay.addGeoJson(JSON.parse(data));
-                polygon_overlay.setStyle(function() {
-                    return ( {
-                        fillColor : "blue",
-                        fillOpacity : 0.25
-                    });
-                });
-            }
-        });
-    };
 
     $.ajax({
         type : "GET",
@@ -317,18 +328,36 @@
     var app = angular.module('mandis', ['LocalStorageModule']);
 
     //diagnosi controller begins
-    app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
+    app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {localStorage.getItem('geoJson')
 
         $scope.search = function() {
+
+            reset_overlay();
+            reset_tabelle();
+
             //Query diagnosi nell'area indicata sulla mappa
-            diagnosi_per_area();
-            diagnosi = JSON.parse(localStorage.getItem('diagnosi_per_area'));
-            $scope.diagnosi = diagnosi;
+            $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", localStorage.getItem('geoJson')).then(function (response) {
+                $scope.diagnosi = JSON.parse(response.data);
+            }, function (err) {
+                alert(err);
+            });
+
 
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            sorgenti_per_area();
-            sorgenti = JSON.parse(localStorage.getItem('sorgenti_per_area'));
-            $scope.sorgenti = JSON.parse(sorgenti).features;
+            $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_area/", localStorage.getItem('geoJson')).then(function (response) {
+                $scope.sorgenti = JSON.parse(response.data).features;
+                polygon_overlay = new google.maps.Data(map);
+                polygon_overlay.setMap(map);
+                polygon_overlay.addGeoJson(JSON.parse(response.data));
+                polygon_overlay.setStyle(function() {
+                    return ( {
+                        fillColor : "blue",
+                        fillOpacity : 0.25
+                    });
+                });
+            }, function (err) {
+                alert(err);
+            });
 
         };
 
@@ -455,6 +484,7 @@
                 break;
             }
            }
+           console.log(geoJson);
         return geoJson;
     }
 
@@ -463,7 +493,7 @@
 <script>
 var polygon_clicked_overlay=null;
 
-    function reset_search(){
+    function reset_tabelle(){
         //Reset della tabella delle diagnosi trovate
         var data_table= $('#diagnosi_tab').DataTable();
         data_table.clear();
@@ -473,7 +503,9 @@ var polygon_clicked_overlay=null;
         var data_table_sorgenti= $('#sorgenti_tab').DataTable();
         data_table_sorgenti.clear();
         data_table_sorgenti.draw();
+    }
 
+    function reset_overlay(){
         //Reset delle sorgenti di inquinamento più vicine all'area indicata sulla mappa
         if(polygon_overlay!=null){
             polygon_overlay.setMap(null);
@@ -483,14 +515,36 @@ var polygon_clicked_overlay=null;
         if(polygon_clicked_overlay!=null){
             polygon_clicked_overlay.setMap(null);
         }
+    }
 
+    function reset_localStorage_sorgenti(){
+        localStorage.removeItem('sorgenti_per_area');
+    }
+
+    function reset_localStorage_diagnosi(){
+        localStorage.removeItem('diagnosi_per_area');
+    }
+
+    function reset_map_drawing(){
         //Reset dell'area disegnata tramite drawing manager di Google Maps
         for (var i = 0; i < shapes.length; i++) {
             shapes[i].setMap(null);
         }
         shapes = [];
+    }
+
+    function remove_geoJson(){
         localStorage.removeItem('geoJson');
-    };
+    }
+
+    function reset_search(){
+        reset_map_drawing();
+        reset_overlay();
+        reset_tabelle();
+        remove_geoJson();
+        reset_localStorage_diagnosi();
+        reset_localStorage_sorgenti();
+    }
 
     //Evidenzia sulla mappa la sorgente relativa alla riga della tabella sorgenti cliccata
     function poly_clicked(poly){

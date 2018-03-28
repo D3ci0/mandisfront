@@ -107,19 +107,19 @@
 					</fieldset>
 				</div>
 				<div ng-app = "mandis" ng-controller = "diagnosi_controller" id="diagnosi_ctrl">
-					<div class="col-md-4 form-group">
-						<div class="row">
-							<label class="col-md-2 control-label">Distanza(Km)</label>
-						</div>
-						<div class="row inputGroupContainer">
-							<div class="col-md-6">
-								<div class="input-group">
-									<input type =_"text" class="form-control" name="distanza" id="select_distanza" ng-model="data.distanza">
-									</input>
-								</div>
-							</div>
-						</div>
-					</div>
+                    <div class="col-md-4 form-group">
+                        <div class="row">
+                            <label class="col-md-2 control-label">Distanza(Km)</label>
+                        </div>
+                        <div class="row inputGroupContainer">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type = "text" name="distanza" id="select_distanza">
+                                    </input>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 					<div class="col-md-5">
 						<fieldset>
 						<legend>
@@ -127,7 +127,7 @@
 						</legend>
 						</fieldset>
 							<div>
-								<table id="diagnosi_tab" class="table table-sm table-hover">
+								<table id="diagnosi_tab" class="table table-hover">
 									<thead class="thead">
 										<tr>
 											<th>Id</th>
@@ -165,22 +165,25 @@
 			$scope.diagnosi = diagnosi.features;
 
 			$scope.search = function(to_search, properties) {
-				var json = {
-					'distanza' : Number(document.getElementById('select_distanza').value),
-					'point' : to_search
-				};
+			    var distanza = Number(document.getElementById('select_distanza').value);
+			    if(isNaN(distanza) == false) {
+                    var json = {
+                        'distanza': distanza,
+                        'point': to_search
+                    };
 
-				$http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_diagnosi/", json).then(function(response) {
-					var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
-					$scope.response = response.data;
-					localStorage.setItem('geojson_srcfound', response.data);
-					localStorage.setItem('residenza_paziente', to_search);
-					localStorage.setItem('diagnosi_data', data);
-					localStorage.setItem('diagnosi_patologia', properties.patologia);
-					$window.location.href = '/mandisfront/src/sorgenti_trovate.html';
-				}, function(err) {
-					alert(err);
-				});
+                    $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_diagnosi/", json).then(function (response) {
+                        var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
+                        $scope.response = response.data;
+                        localStorage.setItem('geojson_srcfound', response.data);
+                        localStorage.setItem('residenza_paziente', to_search);
+                        localStorage.setItem('diagnosi_data', data);
+                        localStorage.setItem('diagnosi_patologia', properties.patologia);
+                        $window.location.href = '/mandisfront/src/sorgenti_trovate.html';
+                    }, function (err) {
+                        alert(err);
+                    });
+                }
 			};
 
 			$scope.evidenzia_marker= function(tmp){

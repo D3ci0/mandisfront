@@ -82,3 +82,8 @@
 .btn.btn-primary {
     background-color: #5353c6;
 }
+
+/*Validator icon position fix*/
+.form-control-feedback {
+    line-height: 27px !important;
+  }
