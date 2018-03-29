@@ -87,3 +87,10 @@
 .form-control-feedback {
     line-height: 27px !important;
   }
+/*modal dialog position fix*/
+.modal-dialog { position: absolute; left: 0; right: 0; top: 40%; bottom: 0; margin: auto; }
+
+/*modal dialog progress bar*/
+.progress-bar.progress-bar-success {
+    background-color: #5353c6;
+}

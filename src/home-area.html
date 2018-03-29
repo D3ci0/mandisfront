@@ -23,6 +23,7 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src='http://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js'></script>
+    <script src="js/main.js"></script>
 
 </head>
 <body style="background-color: #f6f7f9">
@@ -331,15 +332,17 @@
     app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {localStorage.getItem('geoJson')
 
         $scope.search = function() {
-
+            showPleaseWait();
             reset_overlay();
             reset_tabelle();
 
             //Query diagnosi nell'area indicata sulla mappa
             $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", localStorage.getItem('geoJson')).then(function (response) {
                 $scope.diagnosi = JSON.parse(response.data);
+                hidePleaseWait();
             }, function (err) {
                 alert(err);
+                hidePleaseWait();
             });
 
 
@@ -357,6 +360,7 @@
                 });
             }, function (err) {
                 alert(err);
+                hidePleaseWait();
             });
 
         };
@@ -484,7 +488,6 @@
                 break;
             }
            }
-           console.log(geoJson);
         return geoJson;
     }
 
@@ -572,6 +575,8 @@ var polygon_clicked_overlay=null;
         }
         map.setCenter(latlng);
     }
+
+
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&libraries=drawing&callback=initMap"></script>
 </html>
