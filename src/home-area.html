@@ -76,10 +76,10 @@
 
                             <ul class="menu nav-menu" id="menu-primary">
                                 <li class="active">
-                                    <a href="#">Area</a>
+                                    <a href="home-area.html">Area</a>
                                 </li>
                                 <li>
-                                    <a href="#">Sorgente</a>
+                                    <a href="sorgente.html">Sorgente</a>
                                 </li>
                                 <li>
                                     <a href="home.html">Diagnosi</a>
@@ -374,9 +374,12 @@
 
 <script>
     $(document).ready(function() {
-        var tab = $('#diagnosi_tab').DataTable({
+        var dignosi_tab = $('#diagnosi_tab').DataTable({
             "scrollY" : "500px",
             "order" : [],
+            "language": {
+                "emptyTable": "Nessun risultato"
+            },
             "columns" : [
             {
                 "name" : "Patologia",
@@ -398,6 +401,9 @@
         var sorgenti_tab = $('#sorgenti_tab').DataTable({
             "scrollY" : "500px",
             "order" : [],
+            "language": {
+                "emptyTable": "Nessun risultato"
+            },
             "columns" : [
                 {
                     "name" : "Distanza",

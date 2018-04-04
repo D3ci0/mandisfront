@@ -1,6 +1,25 @@
 /*   Displays overlay with "Please wait" text. Based on bootstrap modal. Contains animated progress bar.  */
 function showPleaseWait() {
     var modalLoading = '<div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false role="dialog">\
+                    <div class="modal-body" style="margin-top: 22%; margin-left:45%;">\
+                        <div class="loader">\
+                        </div>\
+                    </div>\
+                </div>';
+    $(document.body).append(modalLoading);
+    $("#pleaseWaitDialog").modal("show");
+}
+
+/* Hides "Please wait" overlay. See function showPleaseWait(). */
+function hidePleaseWait() {
+    $("#pleaseWaitDialog").modal("hide");
+}
+
+
+/** Loader with progress bar */
+/*
+function showPleaseWait() {
+    var modalLoading = '<div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false role="dialog">\
             <div class="modal-dialog">\
                 <div class="modal-content">\
                     <div class="modal-header">\
@@ -19,8 +38,4 @@ function showPleaseWait() {
     $(document.body).append(modalLoading);
     $("#pleaseWaitDialog").modal("show");
 }
-
-/* Hides "Please wait" overlay. See function showPleaseWait(). */
-function hidePleaseWait() {
-    $("#pleaseWaitDialog").modal("hide");
-}
+ */

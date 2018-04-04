@@ -109,6 +109,14 @@
 							<h2 id="data_info"> </h2>
 						</div>
 					</div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h2>Posizione: </h2>
+                        </div>
+                        <div class="col-md-8">
+                            <h2 id="posizione_info"></h2>
+                        </div>
+                    </div>
                 <fieldset style = "margin-top: 25px">
                     <legend>
 
@@ -210,11 +218,13 @@
 
 		$(document).ready(function() {
 			var data,
-			    patologia;
+			    patologia,
+                posizione;
 			data = localStorage.getItem('diagnosi_data');
 			patologia = localStorage.getItem('diagnosi_patologia');
 			$('#patologia_info').append(patologia);
 			$('#data_info').append(data);
+			$('#posizione_info').append('La posizione è indicata con un marker verde sulla mappa');
 		});
 
 	</script>

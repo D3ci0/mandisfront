@@ -14,6 +14,7 @@
 		<link href="css/table.css" rel="stylesheet">
 		<link href="css/style.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+        <script src="js/main.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.7.1/angular-local-storage.js"></script>
 		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
@@ -23,7 +24,7 @@
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 		<script src='http://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js'></script>
-        <script src="js/main.js"></script>
+
 
 	</head>
 	<body style="background-color: #f6f7f9">
@@ -79,10 +80,10 @@
 											<a href="home-area.html">Area</a>
 										</li>
 										<li>
-											<a href="#">Sorgente</a>
+											<a href="sorgente.html">Sorgente</a>
 										</li>
 										<li class="active">
-											<a href="#">Diagnosi</a>
+											<a href="home.html">Diagnosi</a>
 										</li>
 									</ul>
 								</div>
@@ -107,7 +108,7 @@
 					</legend>
 					</fieldset>
 				</div>
-				<div ng-app = "mandis" ng-controller = "diagnosi_controller" id="diagnosi_ctrl">
+				<div ng-app = "mandis" ng-controller = "area_controller" id="area_ctrl">
                     <div class="col-md-4 form-group">
                         <div class="row">
                             <label class="col-md-2 control-label">Distanza(Km)</label>
@@ -160,7 +161,7 @@
 		var app = angular.module('mandis', ['LocalStorageModule']);
 
 		//diagnosi controller begins
-		app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
+		app.controller('area_controller', function($scope, $filter, $http, $window) {
 
 			diagnosi = JSON.parse(localStorage.getItem('lista_diagnosi'));
 			$scope.diagnosi = diagnosi.features;
@@ -190,9 +191,9 @@
                 }
 			};
 
-			$scope.evidenzia_marker= function(tmp){
-			    diagnosi_clicked(tmp);
-            }
+			$scope.evidenzia_marker= function(diagnosi){
+			    diagnosi_clicked(diagnosi);
+            };
 		});
 		//diagnosi controller ends
 	</script>
@@ -261,7 +262,9 @@
 			});
 		});
 
-		function diagnosi_clicked(diagnosi){
+        /* Highlights the diagnosi marker on the map */
+
+        function diagnosi_clicked(diagnosi){
             if(diagnosi_clicked_overlay != null){
                 diagnosi_clicked_overlay.setMap(null);
             }
@@ -283,13 +286,17 @@
             latlng = new google.maps.LatLng(diagnosi.geometry.coordinates[1], diagnosi.geometry.coordinates[0]);
 
             map.setCenter(latlng);
-        }
+        };
+
 
 
 		$(document).ready(function() {
 			var tab = $('#diagnosi_tab').DataTable({
 				"scrollY" : "500px",
 				"order" : [],
+                "language": {
+                    "emptyTable": "Nessun risultato"
+                },
 				"columns" : [{
 					"name" : "Id",
 					"orderable" : true
