@@ -37,24 +37,13 @@
 						<div class="navbar-header">
 							<a class="navbar-brand">Mandis</a>
 						</div>
-						<ul class="nav navbar-nav">
+						<ul id="navbar-menu" class="nav navbar-nav">
 							<li class="active">
-								<a href="#">Home</a>
+								<a href="home-area.html">Ricerca</a>
 							</li>
-							<li class="dropdown">
-								<a class="dropdown-toggle" data-toggle="dropdown">Sorgenti<span class="caret"></span></a>
-								<ul class="dropdown-menu">
-									<li>
-										<a href="#">Circolari</a>
-									</li>
-									<li>
-										<a href="#">Lineari</a>
-									</li>
-									<li>
-										<a href="#">Poligonali</a>
-									</li>
-								</ul>
-							</li>
+                            <li>
+                                <a href="#">Inserimento</a>
+                            </li>
                         </ul>
 					</div><!--/.nav-collapse -->
 				</div>
@@ -163,8 +152,11 @@
 		//diagnosi controller begins
 		app.controller('area_controller', function($scope, $filter, $http, $window) {
 
-			diagnosi = JSON.parse(localStorage.getItem('lista_diagnosi'));
-			$scope.diagnosi = diagnosi.features;
+            $http.get("http://127.0.0.1:8000/diagnosi/").then(function (response) {
+                $scope.diagnosi = JSON.parse(response.data).features;
+            }, function (err) {
+                alert(err);
+            });
 
 			$scope.search = function(to_search, properties) {
 			    var distanza = Number(document.getElementById('select_distanza').value);
@@ -179,11 +171,12 @@
                     $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_diagnosi/", json).then(function (response) {
                         var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
                         $scope.response = response.data;
-                        localStorage.setItem('geojson_srcfound', response.data);
-                        localStorage.setItem('residenza_paziente', to_search);
-                        localStorage.setItem('diagnosi_data', data);
-                        localStorage.setItem('diagnosi_patologia', properties.patologia);
+                        sessionStorage.setItem('geojson_srcfound', response.data);
+                        sessionStorage.setItem('residenza_paziente', to_search);
+                        sessionStorage.setItem('diagnosi_data', data);
+                        sessionStorage.setItem('diagnosi_patologia', properties.patologia);
                         $window.location.href = '/mandisfront/src/sorgenti_trovate.html';
+                        hidePleaseWait();
                     }, function (err) {
                         alert(err);
                         hidePleaseWait();
@@ -231,8 +224,8 @@
 			dataType : "json",
 			url : "http://127.0.0.1:8000/diagnosi/",
 			success : function(data) {
-			    localStorage.setItem('lista_diagnosi', data);
-				marker_added = map.data.addGeoJson(JSON.parse(data));
+			    parsed_data = JSON.parse(data);
+				marker_added = map.data.addGeoJson(parsed_data);
 			}
 		});
 
@@ -291,7 +284,7 @@
 
 
 		$(document).ready(function() {
-			var tab = $('#diagnosi_tab').DataTable({
+			$('#diagnosi_tab').DataTable({
 				"scrollY" : "500px",
 				"order" : [],
                 "language": {

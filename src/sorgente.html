@@ -37,23 +37,12 @@
                 <div class="navbar-header">
                     <a class="navbar-brand">Mandis</a>
                 </div>
-                <ul class="nav navbar-nav">
+                <ul id="navbar-menu" class="nav navbar-nav">
                     <li class="active">
-                        <a href="#">Home</a>
+                        <a href="home-area.html">Ricerca</a>
                     </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown">Sorgenti<span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="#">Circolari</a>
-                            </li>
-                            <li>
-                                <a href="#">Lineari</a>
-                            </li>
-                            <li>
-                                <a href="#">Poligonali</a>
-                            </li>
-                        </ul>
+                    <li>
+                        <a href="#">Inserimento</a>
                     </li>
                 </ul>
             </div><!--/.nav-collapse -->
@@ -123,28 +112,57 @@
                 </div>
             </div>
             <div class="col-md-5">
-                <fieldset>
-                    <legend>
-                        Lista sorgenti
-                    </legend>
-                </fieldset>
-                <div>
-                    <table id="sorgenti_tab" class="table table-hover">
+
+                <!-- Tabella sorgenti -->
+                <div class="col-md-7" style="margin-left: -15px ">
+                    <fieldset>
+                        <legend>
+                            Lista sorgenti
+                        </legend>
+                    </fieldset>
+                    <div>
+                        <table id="sorgenti_tab" class="table table-sm table-hover">
+                            <thead class="thead">
+                            <tr>
+                                <th>Data Inizio</th>
+                                <th>Data Fine</th>
+                                <th>Cerca</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="x in sorgenti" ng-click="evidenzia_poligono(x)">
+                                <td>{{::x.properties.data_inizio | date:'dd/MM/yyyy'}}</td>
+                                <td>{{::x.properties.data_fine | date:'dd/MM/yyyy'}}</td>
+                                <td>
+                                    <button id="search_btn" style="outline:none;background:none;border:none" ng-click="search(x)">
+                                        <i class="glyphicon glyphicon-search"></i>
+                                    </button></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabella diagnosi -->
+
+                <div class = "col-md-5" style = "margin-left: 15px">
+                    <fieldset>
+                        <legend>
+                            Diagnosi
+                        </legend>
+                    </fieldset>
+
+                    <table id="diagnosi_tab" class="table table-sm table-hover">
                         <thead class="thead">
                         <tr>
-                            <th>Data Inizio</th>
-                            <th>Data Fine</th>
-                            <th>Cerca</th>
+                            <th>Patologia</th>
+                            <th>Frequenza</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="x in sorgenti" ng-click="evidenzia_poligono(x)">
-                            <td>{{x.properties.data_inizio | date:'dd/MM/yyyy'}}</td>
-                            <td>{{x.properties.data_fine | date:'dd/MM/yyyy'}}</td>
-                            <td>
-                                <button id="search_btn" style="outline:none;background:none;border:none" ng-click="search(x)">
-                                    <i class="glyphicon glyphicon-search"></i>
-                                </button></td>
+                        <tr ng-repeat="x in diagnosi">
+                            <td>{{x[0]}}</td>
+                            <td>{{x[1]}}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -159,29 +177,27 @@
     var app = angular.module('mandis', ['LocalStorageModule']);
 
     //diagnosi controller begins
-    app.controller('sorgente_controller', function($scope, $filter, $http, $window) {
+    app.controller('sorgente_controller', function($scope, $filter, $http) {
 
-        sorgenti = JSON.parse(localStorage.getItem('lista_sorgenti'));
-        $scope.sorgenti = sorgenti.features;
+        $http.get("http://127.0.0.1:8000/sorgenti/").then(function (response) {
+            $scope.sorgenti = JSON.parse(response.data).features;
+        }, function (err) {
+            alert(err);
+            hidePleaseWait();
+        });
 
         $scope.search = function(sorgente) {
             var distanza = Number(document.getElementById('select_distanza').value);
-            console.log(JSON.stringify(sorgente.geometry));
             if(isNaN(distanza) == false && distanza>0) {
                 showPleaseWait();
                 var json = {
                     'distanza': distanza,
-                    'point': to_search
+                    'features': sorgente
                 };
 
-                $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_diagnosi/", json).then(function (response) {
-                    var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
-                    $scope.response = response.data;
-                    localStorage.setItem('geojson_srcfound', response.data);
-                    localStorage.setItem('residenza_paziente', to_search);
-                    localStorage.setItem('diagnosi_data', data);
-                    localStorage.setItem('diagnosi_patologia', properties.patologia);
-                    $window.location.href = '/mandisfront/src/sorgenti_trovate.html';
+                $http.post("http://127.0.0.1:8000/ricerca_diagnosi_per_sorgente/", json).then(function (response) {
+                    $scope.diagnosi = JSON.parse(response.data);
+                    hidePleaseWait();
                 }, function (err) {
                     alert(err);
                     hidePleaseWait();
@@ -214,7 +230,6 @@
         dataType : "json",
         url : "http://127.0.0.1:8000/sorgenti/",
         success : function(data) {
-            localStorage.setItem('lista_sorgenti', data);
             map.data.addGeoJson(JSON.parse(data));
             map.data.setStyle(function() {
                 return ( {
@@ -260,9 +275,31 @@
         });
     });
 
-
-
     $(document).ready(function() {
+        var dignosi_tab = $('#diagnosi_tab').DataTable({
+            "scrollY" : "500px",
+            "order" : [],
+            "language": {
+                "emptyTable": "Nessun risultato"
+            },
+            "columns" : [
+                {
+                    "name" : "Patologia",
+                    "orderable" : false
+                }, {
+                    "name" : "Frequenza",
+                    "orderable" : false
+                }],
+            "scrollCollapse" : true,
+            "paging" : false,
+            "sDom" : '<"top"i>rt<"bottom"flp><"clear">',
+            "searching" : false,
+            "info" : false,
+            "fnInitComplete" : function() {
+                this.fnAdjustColumnSizing();
+            }
+        });
+
         var tab = $('#sorgenti_tab').DataTable({
             "scrollY" : "500px",
             "order" : [],

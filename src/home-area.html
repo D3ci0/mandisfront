@@ -36,23 +36,12 @@
                 <div class="navbar-header">
                     <a class="navbar-brand">Mandis</a>
                 </div>
-                <ul class="nav navbar-nav">
+                <ul id="navbar-menu" class="nav navbar-nav">
                     <li class="active">
-                        <a href="#">Home</a>
+                        <a href="home-area.html">Ricerca</a>
                     </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown">Sorgenti<span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="#">Circolari</a>
-                            </li>
-                            <li>
-                                <a href="#">Lineari</a>
-                            </li>
-                            <li>
-                                <a href="#">Poligonali</a>
-                            </li>
-                        </ul>
+                    <li>
+                        <a href="#">Inserimento</a>
                     </li>
                 </ul>
             </div><!--/.nav-collapse -->
@@ -73,7 +62,6 @@
                 <div id="site-navigation">
                     <div id="nav-container">
                         <div class="menu-primary-container">
-
                             <ul class="menu nav-menu" id="menu-primary">
                                 <li class="active">
                                     <a href="home-area.html">Area</a>
@@ -235,7 +223,7 @@
             shapes.push(newShape);
             addEditListener(newShape);
             geoJson = exportGeoJson(newShape);
-            localStorage.setItem('geoJson', JSON.stringify(geoJson));
+            sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
             if (drawingManager.getDrawingMode()) {
                 drawingManager.setDrawingMode(null);
             }
@@ -248,14 +236,14 @@
                 case google.maps.drawing.OverlayType.CIRCLE: {
                     newShape.addListener("radius_changed", function(){
                         geoJson = exportGeoJson(newShape);
-                        localStorage.removeItem('geoJson');
-                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                        sessionStorage.removeItem('geoJson');
+                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
                     });
 
                     newShape.addListener("center_changed", function(){
                         geoJson = exportGeoJson(newShape);
-                        localStorage.removeItem('geoJson');
-                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                        sessionStorage.removeItem('geoJson');
+                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
                     });
                     break;
                 }
@@ -263,8 +251,8 @@
                 case google.maps.drawing.OverlayType.RECTANGLE: {
                     newShape.addListener("bounds_changed", function(){
                         geoJson = exportGeoJson(newShape);
-                        localStorage.removeItem('geoJson');
-                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                        sessionStorage.removeItem('geoJson');
+                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
                     });
                     break;
                 }
@@ -272,19 +260,19 @@
                 case google.maps.drawing.OverlayType.POLYGON: {
                     newShape.getPath().addListener("set_at", function(){
                         geoJson = exportGeoJson(newShape);
-                        localStorage.removeItem('geoJson');
-                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                        sessionStorage.removeItem('geoJson');
+                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
                     });
 
                     newShape.getPath().addListener("insert_at", function(){
                         geoJson = exportGeoJson(newShape);
-                        localStorage.removeItem('geoJson');
-                        localStorage.setItem('geoJson', JSON.stringify(geoJson));
+                        sessionStorage.removeItem('geoJson');
+                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
                     });
                     break;
                 }
             }
-            localStorage.setItem('geoJson', JSON.stringify(geoJson));
+            sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
         };
 
         // add a listener for the drawing mode change event, delete any existing polygons
@@ -329,7 +317,7 @@
     var app = angular.module('mandis', ['LocalStorageModule']);
 
     //diagnosi controller begins
-    app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {localStorage.getItem('geoJson')
+    app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
 
         $scope.search = function() {
             showPleaseWait();
@@ -337,7 +325,7 @@
             reset_tabelle();
 
             //Query diagnosi nell'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", localStorage.getItem('geoJson')).then(function (response) {
+            $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", sessionStorage.getItem('geoJson')).then(function (response) {
                 $scope.diagnosi = JSON.parse(response.data);
                 hidePleaseWait();
             }, function (err) {
@@ -347,7 +335,7 @@
 
 
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_area/", localStorage.getItem('geoJson')).then(function (response) {
+            $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_area/", sessionStorage.getItem('geoJson')).then(function (response) {
                 $scope.sorgenti = JSON.parse(response.data).features;
                 polygon_overlay = new google.maps.Data(map);
                 polygon_overlay.setMap(map);
@@ -527,11 +515,11 @@ var polygon_clicked_overlay=null;
     }
 
     function reset_localStorage_sorgenti(){
-        localStorage.removeItem('sorgenti_per_area');
+        sessionStorage.removeItem('sorgenti_per_area');
     }
 
     function reset_localStorage_diagnosi(){
-        localStorage.removeItem('diagnosi_per_area');
+        sessionStorage.removeItem('diagnosi_per_area');
     }
 
     function reset_map_drawing(){
@@ -543,7 +531,7 @@ var polygon_clicked_overlay=null;
     }
 
     function remove_geoJson(){
-        localStorage.removeItem('geoJson');
+        sessionStorage.removeItem('geoJson');
     }
 
     function reset_search(){

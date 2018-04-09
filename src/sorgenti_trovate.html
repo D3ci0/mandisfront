@@ -12,6 +12,7 @@
 		<meta name="description" content="">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="css/table.css" rel="stylesheet">
+        <link href="css/style.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.7.1/angular-local-storage.js"></script>
@@ -24,7 +25,7 @@
 		<script src='http://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js'></script>
 
 	</head>
-	<body>
+	<body style="background-color: #f6f7f9">
 
 		<!-- Body -->
 
@@ -35,27 +36,13 @@
 						<div class="navbar-header">
 							<a class="navbar-brand">Mandis</a>
 						</div>
-						<ul class="nav navbar-nav" >
-							<li>
-								<a href="home-area.html">Home</a>
-							</li>
-							<li class="dropdown">
-								<a class="dropdown-toggle" data-toggle="dropdown">Sorgenti<span class="caret"></span></a>
-								<ul class="dropdown-menu">
-									<li>
-										<a href="#">Circolari</a>
-									</li>
-									<li>
-										<a href="#">Lineari</a>
-									</li>
-									<li>
-										<a href="#">Poligonali</a>
-									</li>
-								</ul>
-							</li>
+						<ul id="navbar-menu" class="nav navbar-nav" >
 							<li class="active">
-								<a>Ricerca</a>
+								<a href="home-area.html">Ricerca</a>
 							</li>
+                            <li>
+                                <a href="#">Inserimento</a>
+                            </li>
                         </ul>
 					</div><!--/.nav-collapse -->
 				</div>
@@ -69,7 +56,35 @@
 				<div id="map" style="height:94.5vh; margin-left:-28px"></div>
 			</div>
 			<!-- Google Map ends -->
-			<div class="col-md-5" style="margin-top: 20px">
+
+            <div class="col-md-5">
+                <div class="row" style="margin-top:15px">
+                    <div class="default-nav-wrapper col-md-8 col-xs-12">
+                        <div id="site-navigation">
+                            <div id="nav-container">
+                                <div class="menu-primary-container">
+
+                                    <ul class="menu nav-menu" id="menu-primary">
+                                        <li>
+                                            <a href="home-area.html">Area</a>
+                                        </li>
+                                        <li class="active">
+                                            <a href="sorgente.html">Sorgente</a>
+                                        </li>
+                                        <li>
+                                            <a href="home.html">Diagnosi</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slider-wrapper"></div>
+            </div>
+
+
+            <div class="col-md-5" style="margin-top: 20px">
 				<fieldset>
 				<legend>
 					Filtra per tipologia
@@ -144,8 +159,8 @@
 				zoom : 9 // Center the map on Rome, Italy.
 			});
 
-			features = map.data.addGeoJson(JSON.parse(localStorage.getItem('geojson_srcfound')));
-			point = localStorage.getItem('residenza_paziente').split(',');
+			features = map.data.addGeoJson(JSON.parse(sessionStorage.getItem('geojson_srcfound')));
+			point = sessionStorage.getItem('residenza_paziente').split(',');
 
             var icon = {
                 url: 'http://www.clker.com/cliparts/R/g/O/v/U/h/google-maps-marker-for-residencelamontagne-md.png',
@@ -220,8 +235,8 @@
 			var data,
 			    patologia,
                 posizione;
-			data = localStorage.getItem('diagnosi_data');
-			patologia = localStorage.getItem('diagnosi_patologia');
+			data = sessionStorage.getItem('diagnosi_data');
+			patologia = sessionStorage.getItem('diagnosi_patologia');
 			$('#patologia_info').append(patologia);
 			$('#data_info').append(data);
 			$('#posizione_info').append('La posizione è indicata con un marker verde sulla mappa');

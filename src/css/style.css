@@ -110,3 +110,19 @@
     100% { transform: rotate(360deg); }
 }
 
+.navbar.navbar-default.navbar-fixed-top{
+    background-color: #5353c6;
+}
+
+#navbar-menu li > a{
+    color: whitesmoke!important;
+}
+
+#navbar-menu > .active > a,
+#navbar-menu li:hover{
+    background-color: #6b6bff;
+}
+
+#navbar > .navbar-header > a {
+    color: whitesmoke;
+}
