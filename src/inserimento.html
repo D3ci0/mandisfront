@@ -14,15 +14,17 @@
     <link href="css/table.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.7.1/angular-local-storage.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <!-- Latest compiled and minified JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src='http://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
     <script src="js/main.js"></script>
 
 </head>
@@ -37,11 +39,11 @@
                     <a class="navbar-brand">Mandis</a>
                 </div>
                 <ul id="navbar-menu" class="nav navbar-nav">
-                    <li class="active">
+                    <li>
                         <a href="home-area.html">Ricerca</a>
                     </li>
-                    <li>
-                        <a href="#">Inserimento</a>
+                    <li class="active">
+                        <a href="inserimento.html">Inserimento</a>
                     </li>
                 </ul>
             </div><!--/.nav-collapse -->
@@ -56,111 +58,69 @@
     </div>
     <!-- Google Map ends -->
 
-    <div class="col-md-5">
-        <div class="row" style="margin-top:15px">
-            <div class="default-nav-wrapper col-md-8 col-xs-12">
-                <div id="site-navigation">
-                    <div id="nav-container">
-                        <div class="menu-primary-container">
-                            <ul class="menu nav-menu" id="menu-primary">
-                                <li class="active">
-                                    <a href="home-area.html">Area</a>
-                                </li>
-                                <li>
-                                    <a href="sorgente.html">Sorgente</a>
-                                </li>
-                                <li>
-                                    <a href="home.html">Diagnosi</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
+    <div class="col-md-5" style="margin-top: 15px;">
+        <div class="alert alert-info">
+            <strong>Info!</strong> Spiegare come funziona l'inserimento.
         </div>
-        <div class="slider-wrapper"></div>
     </div>
 
-    <div class="col-md-5">
-        <div class="alert alert-info">
-            <strong>Info!</strong> Spiegare come funziona la ricerca.
+    <div id="error_alert" class="col-md-5" style="margin-top: 15px; display: none" >
+        <div id="error_text" class="alert alert-danger">
         </div>
     </div>
 
     <form id="ricerca_sorgenti" method="post">
         <div class="col-md-5">
             <fieldset>
-            <legend>
-                Ricerca sorgenti
-            </legend>
+                <legend>
+                    Inserimento sorgenti
+                </legend>
             </fieldset>
         </div>
+
         <div ng-app = "mandis" ng-controller = "diagnosi_controller" id="diagnosi_ctrl">
+
+            <div class="col-md-2">
+                <label>Data Inizio</label>
+                <div id="data_inizio" class="input-group date" data-provide="datepicker">
+                    <input id="data_inizio_input" type="text" class="form-control"  placeholder="Seleziona la data di inizio">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-th"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+
+                <label>Data Fine</label>
+                <div id="data_fine" class="input-group date" data-provide="datepicker">
+                    <input id="data_fine_input" type="text" class="form-control" placeholder="Seleziona la data di fine" disabled="true">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-th"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5" style="margin-top: 20px;">
+                <fieldset>
+                    <legend>
+
+                    </legend>
+                </fieldset>
+            </div>
+
             <div class="col-md-4 form-group">
-                <button id="search_btn" class="btn btn-primary"  ng-click="search()">
-                    Cerca
-                    <i class="glyphicon glyphicon-search"> </i>
+                <button id="search_btn" class="btn btn-primary"  ng-click="insert()">
+                    Inserisci
+                    <i class="glyphicon glyphicon-circle-arrow-up"> </i>
                 </button>
                 <button id="reset_btn" class="btn btn-danger" onclick="reset_search()">
                     Reset
                     <i class="glyphicon glyphicon-repeat"> </i>
                 </button>
             </div>
-            <div class="col-md-5">
 
-                <!-- Tabella diagnosi -->
-
-                <div class="col-md-5" style="margin-left: -15px ">
-                    <fieldset>
-                        <legend>
-                            Diagnosi
-                        </legend>
-                    </fieldset>
-
-                    <table id="diagnosi_tab" class="table table-sm table-hover">
-                        <thead class="thead">
-                        <tr>
-                            <th>Patologia</th>
-                            <th>Frequenza</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="x in diagnosi">
-                            <td>{{x[0]}}</td>
-                            <td>{{x[1]}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Tabella sorgenti -->
-                <div class="col-md-7" style = "margin-left: 15px">
-                    <fieldset>
-                        <legend>
-                            Sorgenti
-                        </legend>
-                    </fieldset>
-
-                    <table id="sorgenti_tab" class="table table-hover">
-                        <thead class="thead">
-                            <tr>
-                                <th>Distanza</th>
-                                <th>Data Inizio</th>
-                                <th>Data Fine</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="x in sorgenti"  ng-click="evidenzia_poligono(x)">
-                                <td>{{x.properties.distanza}}</td>
-                                <td>{{x.properties.data_inizio | date:"dd/MM/yyyy"}}</td>
-                                <td>{{x.properties.data_fine | date:"dd/MM/yyyy"}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
         </div>
     </form>
 </div>
@@ -318,39 +278,34 @@
 
     //diagnosi controller begins
     app.controller('diagnosi_controller', function($scope, $filter, $http) {
+        var date_error = 'Inserisci date valide.';
+        var shape_error = 'Disegna sulla mappa un poligono, un cerchio o una linea da inserire.';
+        $scope.insert = function() {
+            if(validate_shape() == null){
+                show_error(shape_error);
+                return;
+            }
 
-        $scope.search = function() {
-            showPleaseWait();
-            reset_overlay();
-            reset_tabelle();
+            if(validate_date() == false ){
+                show_error(date_error);
+                return;
+            }
 
-            //Query diagnosi nell'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/ricerca_malattie_per_area/", sessionStorage.getItem('geoJson')).then(function (response) {
-                $scope.diagnosi = JSON.parse(response.data);
-                hidePleaseWait();
-            }, function (err) {
-                alert(err);
-                hidePleaseWait();
-            });
+            var json = {
+                'data_inizio': document.getElementById('data_inizio_input').value,
+                'data_fine': document.getElementById('data_fine_input').value,
+                'features': sessionStorage.getItem('geoJson')
+            };
 
 
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_area/", sessionStorage.getItem('geoJson')).then(function (response) {
-                $scope.sorgenti = JSON.parse(response.data).features;
-                polygon_overlay = new google.maps.Data(map);
-                polygon_overlay.setMap(map);
-                polygon_overlay.addGeoJson(JSON.parse(response.data));
-                polygon_overlay.setStyle(function() {
-                    return ( {
-                        fillColor : "blue",
-                        fillOpacity : 0.25
-                    });
-                });
+            $http.post("http://127.0.0.1:8000/inserisci_sorgente_poligonale/", json).then(function (response) {
+
+
             }, function (err) {
                 alert(err);
                 hidePleaseWait();
             });
-
         };
 
         $scope.evidenzia_poligono = function(tmp){
@@ -361,59 +316,6 @@
 </script>
 
 <script>
-    $(document).ready(function() {
-        var dignosi_tab = $('#diagnosi_tab').DataTable({
-            "scrollY" : "500px",
-            "order" : [],
-            "language": {
-                "emptyTable": "Nessun risultato"
-            },
-            "columns" : [
-            {
-                "name" : "Patologia",
-                "orderable" : false
-            }, {
-                "name" : "Frequenza",
-                "orderable" : false
-            }],
-            "scrollCollapse" : true,
-            "paging" : false,
-            "sDom" : '<"top"i>rt<"bottom"flp><"clear">',
-            "searching" : false,
-            "info" : false,
-            "fnInitComplete" : function() {
-                this.fnAdjustColumnSizing();
-            }
-        });
-
-        var sorgenti_tab = $('#sorgenti_tab').DataTable({
-            "scrollY" : "500px",
-            "order" : [],
-            "language": {
-                "emptyTable": "Nessun risultato"
-            },
-            "columns" : [
-                {
-                    "name" : "Distanza",
-                    "orderable" : false
-                },{
-                    "name" : "Data Inizio",
-                    "orderable" : false
-                }, {
-                    "name" : "Data Fine",
-                    "orderable" : false
-                }],
-            "scrollCollapse" : true,
-            "paging" : false,
-            "sDom" : '<"top"i>rt<"bottom"flp><"clear">',
-            "searching" : false,
-            "info" : false,
-            "fnInitComplete" : function() {
-                this.fnAdjustColumnSizing();
-            }
-        });
-    });
-
     function exportGeoJson(shape) {
         var geoJson = {
             "type": "FeatureCollection",
@@ -444,22 +346,22 @@
             case google.maps.drawing.OverlayType.RECTANGLE: {
                 var b = shape.getBounds(),
                     p = [   [
-                            b.getSouthWest().lng(),
-                            b.getSouthWest().lat()
-                        ],
-                            [
+                        b.getSouthWest().lng(),
+                        b.getSouthWest().lat()
+                    ],
+                        [
                             b.getNorthEast().lng(),
                             b.getSouthWest().lat()
                         ],
-                            [
+                        [
                             b.getNorthEast().lng(),
                             b.getNorthEast().lat()
                         ],
-                            [
+                        [
                             b.getSouthWest().lng(),
                             b.getNorthEast().lat()
                         ],
-                            [
+                        [
                             b.getSouthWest().lng(),
                             b.getSouthWest().lat()
                         ]
@@ -481,46 +383,38 @@
                 geoJson.features.push(shapeFeature);
                 break;
             }
-           }
+        }
         return geoJson;
     }
 
 </script>
 
 <script>
-var polygon_clicked_overlay=null;
+    $(document).ready(function(){
+        reset_search();
+    });
 
-    function reset_tabelle(){
-        //Reset della tabella delle diagnosi trovate
-        var data_table= $('#diagnosi_tab').DataTable();
-        data_table.clear();
-        data_table.draw();
-
-        //Reset della tabella delle sorgenti trovate
-        var data_table_sorgenti= $('#sorgenti_tab').DataTable();
-        data_table_sorgenti.clear();
-        data_table_sorgenti.draw();
-    }
-
-    function reset_overlay(){
-        //Reset delle sorgenti di inquinamento più vicine all'area indicata sulla mappa
-        if(polygon_overlay!=null){
-            polygon_overlay.setMap(null);
-        }
-
-        //Reset delle sorgenti selezionate dalla tabella
-        if(polygon_clicked_overlay!=null){
-            polygon_clicked_overlay.setMap(null);
-        }
-    }
-
-    function reset_localStorage_sorgenti(){
-        sessionStorage.removeItem('sorgenti_per_area');
-    }
-
-    function reset_localStorage_diagnosi(){
-        sessionStorage.removeItem('diagnosi_per_area');
-    }
+    $(document).ready(function() {
+        var datepicker = $.fn.datepicker.noConflict(); // return $.fn.datepicker to previously assigned value
+        $.fn.bootstrapDP = datepicker;                 // give $().bootstrapDP the bootstrap-datepicker functionality
+        datepicker.defaults.format = "dd/mm/yyyy";
+        $("#data_inizio").bootstrapDP({
+            format: 'dd/mm/yyyy',
+            todayBtn: "linked",
+            autoclose: true,
+            todayHighlight: true
+        }).on('changeDate', function(date_selected){
+            var date = new Date(date_selected.date.valueOf());
+            $('#data_fine_input').prop('disabled', false);
+            $('#data_fine').bootstrapDP('setStartDate', date);
+        });
+        $("#data_fine").bootstrapDP({
+            autoclose:true,
+            todayBtn: "linked",
+            format: 'dd/mm/yyyy',
+            todayHighlight: true
+        });
+    });
 
     function reset_map_drawing(){
         //Reset dell'area disegnata tramite drawing manager di Google Maps
@@ -536,41 +430,36 @@ var polygon_clicked_overlay=null;
 
     function reset_search(){
         reset_map_drawing();
-        reset_overlay();
-        reset_tabelle();
         remove_geoJson();
-        reset_localStorage_diagnosi();
-        reset_localStorage_sorgenti();
+        hide_error();
     }
 
-    //Evidenzia sulla mappa la sorgente relativa alla riga della tabella sorgenti cliccata
-    function poly_clicked(poly){
-        var latlng=null;
-        if(polygon_clicked_overlay!=null){
-            polygon_clicked_overlay.setMap(null);
-        }
-        polygon_clicked_overlay = new google.maps.Data(map);
-        polygon_clicked_overlay.setMap(map);
-        polygon_clicked_overlay.addGeoJson(poly);
-        polygon_clicked_overlay.setStyle(function() {
-            return ( {
-                fillColor : "yellow",
-                fillOpacity : 0.5,
-                strokeColor: "yellow"
-            });
-        });
-
-        //Prende il primo punto del geometry. Su questo verrà centrata la mappa
-        if(poly.geometry.type == 'LineString'){
-            latlng = new google.maps.LatLng(poly.geometry.coordinates[0][1], poly.geometry.coordinates[0][0])
-        }
-        if(poly.geometry.type == 'Polygon'){
-            latlng = new google.maps.LatLng(poly.geometry.coordinates[0][0][1], poly.geometry.coordinates[0][0][0])
-        }
-        map.setCenter(latlng);
+    function validate_shape(){
+        shape = sessionStorage.getItem('geoJson');
+        return shape;
     }
 
+    function show_error(error){
+        $('#error_alert').show();
+        $('#error_text').html("<strong>Attenzione</strong>"+" " + error +"");
+    }
 
+    function validate_date(){
+        var data_inizio = $("#data_inizio_input").val();
+        var data_inizio_array = data_inizio.split("/");
+        var data_inizio_date = new Date(data_inizio_array[2], data_inizio_array[1]-1, data_inizio_array[0]);
+        var data_fine = $('#data_fine_input').val();
+        var data_fine_array = data_fine.split("/");
+        var data_fine_date = new Date(data_fine_array[2], data_fine_array[1]-1, data_fine_array[0]);
+
+        if(data_fine_date > data_inizio_date)
+            return true;
+        return false;
+    }
+
+    function hide_error(){
+        $('#error_alert').hide();
+    }
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&libraries=drawing&callback=initMap"></script>
 </html>
