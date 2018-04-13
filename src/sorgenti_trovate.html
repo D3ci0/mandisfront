@@ -23,6 +23,7 @@
 		<!-- Latest compiled and minified JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 		<script src='http://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js'></script>
+        <script src="js/main.js"></script>
 
 	</head>
 	<body style="background-color: #f6f7f9">
@@ -41,7 +42,7 @@
 								<a href="home-area.html">Ricerca</a>
 							</li>
                             <li>
-                                <a href="#">Inserimento</a>
+                                <a href="inserimento.html">Inserimento</a>
                             </li>
                         </ul>
 					</div><!--/.nav-collapse -->
@@ -187,48 +188,6 @@
 		function go_back(){
             location.href = '/mandisfront/src/home.html'
         }
-
-		function circolari_func(checkbox_c) {
-			if (checkbox_c.checked) {
-				for (var i = 0; i < features.length; i++) {
-					if (features[i].getGeometry().getType() == 'Polygon' && features[i].getProperty('raggio') != null)
-						map.data.add(features[i]);
-				}
-			} else {
-				for (var i = 0; i < features.length; i++) {
-					if (features[i].getGeometry().getType() == 'Polygon' && features[i].getProperty('raggio') != null)
-						map.data.remove(features[i]);
-				}
-			}
-		}
-
-		function poligonali_func(checkbox_p) {
-			if (checkbox_p.checked) {
-				for (var i = 0; i < features.length; i++) {
-					if (features[i].getGeometry().getType() == 'Polygon' && features[i].getProperty('raggio') == null)
-						map.data.add(features[i]);
-				}
-			} else {
-				for (var i = 0; i < features.length; i++) {
-					if (features[i].getGeometry().getType() == 'Polygon' && features[i].getProperty('raggio') == null)
-						map.data.remove(features[i]);
-				}
-			}
-		}
-
-		function lineari_func(checkbox_l) {
-			if (checkbox_l.checked) {
-				for (var i = 0; i < features.length; i++) {
-					if (features[i].getGeometry().getType() == 'LineString')
-						map.data.add(features[i]);
-				}
-			} else {
-				for (var i = 0; i < features.length; i++) {
-					if (features[i].getGeometry().getType() == 'LineString')
-						map.data.remove(features[i]);
-				}
-			}
-		}
 
 
 		$(document).ready(function() {

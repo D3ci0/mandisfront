@@ -65,8 +65,14 @@
         </div>
     </div>
 
-    <div id="error_alert" class="col-md-5" style="margin-top: 15px; display: none" >
+    <div id="error_alert" class="col-md-5" style = "display: none" >
         <div id="error_text" class="alert alert-danger">
+        </div>
+    </div>
+
+    <div id="success_alert" class="col-md-5" style="display: none" >
+        <div id="success_text" class="alert alert-success">
+            <strong>Success!</strong> Sorgente inserita correttamente.
         </div>
     </div>
 
@@ -80,6 +86,23 @@
         </div>
 
         <div ng-app = "mandis" ng-controller = "diagnosi_controller" id="diagnosi_ctrl">
+
+            <div class="modal" id="areYouSureDialog" data-backdrop="static" data-keyboard="false" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Conferma inserimento</h4>
+                        </div>
+                        <div class="modal-body">
+                            Sei sicuro di voler inserire questa sorgente?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click = "insert()">Conferma</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Cancella</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="col-md-2">
                 <label>Data Inizio</label>
@@ -111,7 +134,7 @@
             </div>
 
             <div class="col-md-4 form-group">
-                <button id="search_btn" class="btn btn-primary"  ng-click="insert()">
+                <button id="search_btn" class="btn btn-primary"  onclick="are_you_sure()">
                     Inserisci
                     <i class="glyphicon glyphicon-circle-arrow-up"> </i>
                 </button>
@@ -130,7 +153,6 @@
     var shapes = [];
     var circle;
     var map;
-    var polygon_overlay=null;
     var drawingManager=null;
     var geoJson=null;
 
@@ -189,7 +211,7 @@
             }
         });
 
-        //Add a listener for circle radius change
+        //Add a listener for shape changing
         function addEditListener(shape){
             newShape = shape;
             switch (newShape.type){
@@ -291,6 +313,8 @@
                 return;
             }
 
+            showPleaseWait();
+
             var json = {
                 'data_inizio': document.getElementById('data_inizio_input').value,
                 'data_fine': document.getElementById('data_fine_input').value,
@@ -299,9 +323,15 @@
 
 
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/inserisci_sorgente_poligonale/", json).then(function (response) {
-
-
+            $http.post("http://127.0.0.1:8000/inserisci_sorgente_poligonale/", json).then(function () {
+                reset_search();
+                reset_input();
+                hidePleaseWait();
+                show_success();
+                setTimeout(function() { $("#success_alert").animate({
+                    height: "toggle",
+                    opacity: "toggle"
+                },1000); }, 5000);
             }, function (err) {
                 alert(err);
                 hidePleaseWait();
@@ -315,83 +345,15 @@
     //diagnosi controller ends
 </script>
 
-<script>
-    function exportGeoJson(shape) {
-        var geoJson = {
-            "type": "FeatureCollection",
-            "features": []
-        };
-        var shapeFeature = {
-            "type": "Feature",
-            "geometry": {
-                "type": "",
-                "coordinates": []
-            },
-            "properties": {}
-        };
-        var arr = [];
-        switch (shape.type) {
-            case google.maps.drawing.OverlayType.POLYGON: {
-                for (var i = 0; i < shape.getPath().getLength(); i++) {
-                    var pt = shape.getPath().getAt(i);
-                    arr.push([pt.lng(), pt.lat()]);
-                }
-                var pt = shape.getPath().getAt(0);
-                arr.push([pt.lng(), pt.lat()]);
-                shapeFeature.geometry.coordinates.push(arr);
-                shapeFeature.geometry.type = google.maps.drawing.OverlayType.POLYGON;
-                geoJson.features.push(shapeFeature);
-                break;
-            }
-            case google.maps.drawing.OverlayType.RECTANGLE: {
-                var b = shape.getBounds(),
-                    p = [   [
-                        b.getSouthWest().lng(),
-                        b.getSouthWest().lat()
-                    ],
-                        [
-                            b.getNorthEast().lng(),
-                            b.getSouthWest().lat()
-                        ],
-                        [
-                            b.getNorthEast().lng(),
-                            b.getNorthEast().lat()
-                        ],
-                        [
-                            b.getSouthWest().lng(),
-                            b.getNorthEast().lat()
-                        ],
-                        [
-                            b.getSouthWest().lng(),
-                            b.getSouthWest().lat()
-                        ]
-
-                    ]
-                shapeFeature.geometry.coordinates.push(p);
-                shapeFeature.geometry.type = google.maps.drawing.OverlayType.POLYGON;
-                geoJson.features.push(shapeFeature);
-                break;
-            }
-            case google.maps.drawing.OverlayType.CIRCLE:{
-                var center = [
-                    shape.getCenter().lng(),
-                    shape.getCenter().lat()
-                ]
-                shapeFeature.geometry.type = google.maps.drawing.OverlayType.CIRCLE;
-                shapeFeature.geometry.coordinates.push(center);
-                shapeFeature.properties = shape.getRadius();
-                geoJson.features.push(shapeFeature);
-                break;
-            }
-        }
-        return geoJson;
-    }
-
-</script>
 
 <script>
     $(document).ready(function(){
+        reset_input();
         reset_search();
+    });
+
+    $('#reset_btn').click(function () {
+        reset_input();
     });
 
     $(document).ready(function() {
@@ -416,50 +378,11 @@
         });
     });
 
-    function reset_map_drawing(){
-        //Reset dell'area disegnata tramite drawing manager di Google Maps
-        for (var i = 0; i < shapes.length; i++) {
-            shapes[i].setMap(null);
-        }
-        shapes = [];
+    function reset_input(){
+        document.getElementById('data_inizio_input').value = "";
+        document.getElementById('data_fine_input').value = "";
     }
 
-    function remove_geoJson(){
-        sessionStorage.removeItem('geoJson');
-    }
-
-    function reset_search(){
-        reset_map_drawing();
-        remove_geoJson();
-        hide_error();
-    }
-
-    function validate_shape(){
-        shape = sessionStorage.getItem('geoJson');
-        return shape;
-    }
-
-    function show_error(error){
-        $('#error_alert').show();
-        $('#error_text').html("<strong>Attenzione</strong>"+" " + error +"");
-    }
-
-    function validate_date(){
-        var data_inizio = $("#data_inizio_input").val();
-        var data_inizio_array = data_inizio.split("/");
-        var data_inizio_date = new Date(data_inizio_array[2], data_inizio_array[1]-1, data_inizio_array[0]);
-        var data_fine = $('#data_fine_input').val();
-        var data_fine_array = data_fine.split("/");
-        var data_fine_date = new Date(data_fine_array[2], data_fine_array[1]-1, data_fine_array[0]);
-
-        if(data_fine_date > data_inizio_date)
-            return true;
-        return false;
-    }
-
-    function hide_error(){
-        $('#error_alert').hide();
-    }
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&libraries=drawing&callback=initMap"></script>
 </html>
