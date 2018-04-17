@@ -88,6 +88,15 @@ function exportGeoJson(shape) {
     };
     var arr = [];
     switch (shape.type) {
+        case google.maps.drawing.OverlayType.POLYLINE:{
+            for (var i = 0; i < shape.getPath().getLength(); i++) {
+                var pt = shape.getPath().getAt(i);
+                shapeFeature.geometry.coordinates.push([pt.lng(), pt.lat()]);
+            }
+            shapeFeature.geometry.type = "linestring";
+            geoJson.features.push(shapeFeature);
+            break;
+        }
         case google.maps.drawing.OverlayType.POLYGON: {
             for (var i = 0; i < shape.getPath().getLength(); i++) {
                 var pt = shape.getPath().getAt(i);

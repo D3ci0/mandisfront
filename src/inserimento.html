@@ -151,6 +151,7 @@
 
 <script>
     var shapes = [];
+    var src_loaded = null;
     var circle;
     var map;
     var drawingManager=null;
@@ -170,7 +171,7 @@
             drawingControl: true,
             drawingControlOptions: {
                 position: google.maps.ControlPosition.TOP_CENTER,
-                drawingModes: ['circle', 'polygon', 'rectangle']
+                drawingModes: ['circle', 'polygon', 'polyline']
             },
             markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
             circleOptions: {
@@ -187,7 +188,7 @@
                 strokeWeight: 2.5,
                 editable: true
             },
-            rectangleOptions: {
+            polylineOptions: {
                 fillColor: '#06ff8f',
                 strokeColor: '#0b9c07',
                 strokeWeight: 2.5,
@@ -239,7 +240,7 @@
                     break;
                 }
 
-                case google.maps.drawing.OverlayType.POLYGON: {
+                case google.maps.drawing.OverlayType.POLYLINE: {
                     newShape.getPath().addListener("set_at", function(){
                         geoJson = exportGeoJson(newShape);
                         sessionStorage.removeItem('geoJson');
@@ -264,34 +265,12 @@
             }
         });
 
+        get_sorgenti();
+        get_diagnosi();
 
     }
 
-    $.ajax({
-        type : "GET",
-        dataType : "json",
-        url : "http://127.0.0.1:8000/sorgenti/",
-        success : function(data) {
-            map.data.addGeoJson(JSON.parse(data));
-            map.data.setStyle(function() {
-                return ( {
-                    fillColor : "red",
-                    fillOpacity : 0.25
-                });
-            });
-        }
-    });
 
-
-
-    $.ajax({
-        type : "GET",
-        dataType : "json",
-        url : "http://127.0.0.1:8000/diagnosi/",
-        success : function(data) {
-            map.data.addGeoJson(JSON.parse(data));
-        }
-    });
 
 </script>
 
@@ -321,12 +300,12 @@
                 'features': sessionStorage.getItem('geoJson')
             };
 
-
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/inserisci_sorgente_poligonale/", json).then(function () {
+            $http.post("http://127.0.0.1:8000/inserisci_sorgente/", json).then(function () {
                 reset_search();
                 reset_input();
                 hidePleaseWait();
+                get_sorgenti();
                 show_success();
                 setTimeout(function() { $("#success_alert").animate({
                     height: "toggle",
@@ -381,6 +360,41 @@
     function reset_input(){
         document.getElementById('data_inizio_input').value = "";
         document.getElementById('data_fine_input').value = "";
+    }
+
+
+    function get_sorgenti(){
+        if(src_loaded != null){
+            for(i=0;i<src_loaded.length;i++){
+                map.data.remove(src_loaded[i]);
+            }
+        }
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://127.0.0.1:8000/sorgenti/",
+            success: function (data) {
+                src_loaded = map.data.addGeoJson(JSON.parse(data));
+                map.data.setStyle(function () {
+                    return ({
+                        fillColor: "red",
+                        fillOpacity: 0.25
+                    });
+                });
+            }
+        });
+    }
+
+
+    function get_diagnosi() {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://127.0.0.1:8000/diagnosi/",
+            success: function (data) {
+                map.data.addGeoJson(JSON.parse(data));
+            }
+        });
     }
 
 </script>
