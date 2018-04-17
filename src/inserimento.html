@@ -301,7 +301,7 @@
             };
 
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            $http.post("http://127.0.0.1:8000/inserisci_sorgente/", json).then(function () {
+            $http.post("https://floating-lowlands-19121.herokuapp.com/inserisci_sorgente/", json).then(function () {
                 reset_search();
                 reset_input();
                 hidePleaseWait();
@@ -372,7 +372,7 @@
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "http://127.0.0.1:8000/sorgenti/",
+            url: "https://floating-lowlands-19121.herokuapp.com/sorgenti/",
             success: function (data) {
                 src_loaded = map.data.addGeoJson(JSON.parse(data));
                 map.data.setStyle(function () {
@@ -390,7 +390,7 @@
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "http://127.0.0.1:8000/diagnosi/",
+            url: "https://floating-lowlands-19121.herokuapp.com/diagnosi/",
             success: function (data) {
                 map.data.addGeoJson(JSON.parse(data));
             }

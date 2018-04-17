@@ -152,7 +152,7 @@
 		//diagnosi controller begins
 		app.controller('area_controller', function($scope, $filter, $http, $window) {
 
-            $http.get("http://127.0.0.1:8000/diagnosi/").then(function (response) {
+            $http.get("https://floating-lowlands-19121.herokuapp.com/diagnosi/").then(function (response) {
                 $scope.diagnosi = JSON.parse(response.data).features;
             }, function (err) {
                 alert(err);
@@ -168,7 +168,7 @@
                         'point': to_search
                     };
 
-                    $http.post("http://127.0.0.1:8000/ricerca_sorgenti_per_diagnosi/", json).then(function (response) {
+                    $http.post("https://floating-lowlands-19121.herokuapp.com/ricerca_sorgenti_per_diagnosi/", json).then(function (response) {
                         var data = $filter('date')(properties.data_diagnosi, "dd/MM/yyyy");
                         $scope.response = response.data;
                         sessionStorage.setItem('geojson_srcfound', response.data);
@@ -207,7 +207,7 @@
 		$.ajax({
 			type : "GET",
 			dataType : "json",
-			url : "http://127.0.0.1:8000/sorgenti/",
+			url : "https://floating-lowlands-19121.herokuapp.com/sorgenti/",
 			success : function(data) {
 				map.data.addGeoJson(JSON.parse(data));
 				map.data.setStyle(function() {
@@ -222,7 +222,7 @@
 		$.ajax({
 			type : "GET",
 			dataType : "json",
-			url : "http://127.0.0.1:8000/diagnosi/",
+			url : "https://floating-lowlands-19121.herokuapp.com/diagnosi/",
 			success : function(data) {
 			    parsed_data = JSON.parse(data);
 				marker_added = map.data.addGeoJson(parsed_data);
