@@ -87,6 +87,11 @@
         </div>
     </div>
 
+    <div id="error_alert" class="col-md-5" style = "display: none" >
+        <div id="error_text" class="alert alert-danger">
+        </div>
+    </div>
+
     <form id="ricerca_sorgenti" method="post">
         <div class="col-md-5">
             <fieldset>
@@ -319,6 +324,13 @@
     app.controller('diagnosi_controller', function($scope, $filter, $http) {
 
         $scope.search = function() {
+
+            if(validate_shape()==null){
+                show_error("Disegna sulla mappa un'area per la ricerca.");
+                return;
+            }
+
+            hide_error();
             showPleaseWait();
             reset_overlay();
             reset_tabelle();
@@ -540,6 +552,7 @@ var polygon_clicked_overlay=null;
         remove_geoJson();
         reset_localStorage_diagnosi();
         reset_localStorage_sorgenti();
+        hide_error();
     }
 
     //Evidenzia sulla mappa la sorgente relativa alla riga della tabella sorgenti cliccata
