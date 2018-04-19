@@ -74,6 +74,7 @@
   color: #333399;
  }
 
+
 .glyphicon.glyphicon-search{
     top: 2px;
     left: 2px;
@@ -112,6 +113,7 @@
 
 .navbar.navbar-default.navbar-fixed-top{
     background-color: #5353c6;
+    border-bottom-color: #5353c6
 }
 
 #navbar-menu li > a{
@@ -126,3 +128,4 @@
 #navbar > .navbar-header > a {
     color: whitesmoke;
 }
+

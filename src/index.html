@@ -1,10 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Mandis</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/table.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.7.1/angular-local-storage.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="js/main.js"></script>
 </head>
-<body>
+<body style="background-color: #f6f7f9">
 
+<!-- Body -->
+<div class="col-md-12">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div id="navbar" class="navbar-collapse collapse" style="float:right;margin-right:15%">
+                <div class="navbar-header">
+                    <a href="index.html" class="navbar-brand">Mandis</a>
+                </div>
+                <ul id="navbar-menu" class="nav navbar-nav">
+                    <li>
+                        <a href="home-area.html">Ricerca</a>
+                    </li>
+                    <li>
+                        <a href="inserimento.html">Inserimento</a>
+                    </li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+</div>
+
+<section class = "jumbotron text-center" style="margin-top: 50px;height: 400px;">
+    <div id="map" style="width: 100%;height: inherit;margin-top: -48px;opacity: 0.3"></div>
+    <div class="container" style="z-index: 10; margin-top: -350px;position: relative">
+        <h1 class = "jumbotron-heading" style="color: #4169e1">
+            Mandis
+        </h1>
+        <p style="color: #222222" class = "lead text-muted">Ufficio stampa pensaci tu</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-2 text-center">
+            <img class="rounded-circle" src="img/search-128.ico">
+            <h2>Ricerca</h2>
+            <p>Testo per spiegare la ricerca.</p>
+            <p>
+                <a class="btn btn-primary" href="home-area.html" role="button">Ricerca</a>
+            </p>
+        </div>
+        <div class="col-lg-4 text-center">
+            <img class="rounded-circle" src="img/cloud-computing.png">
+            <h2>Inserimento</h2>
+            <p>Testo per spiegare l'inserimento.</p>
+            <p>
+                <a class="btn btn-primary" href="inserimento.html" role="button">Inserisci</a>
+            </p>
+        </div>
+    </div>
+</div>
 </body>
+
+<script>
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {
+                lat: 41.066927730193456,
+                lng: 14.330291748046875
+            },
+            zoom: 9,
+            disableDefaultUI: true,
+            draggable: false,
+            keyboardShortcuts: false,
+            disableDoubleClickZoom: true,
+            noClear: true
+        });
+    }
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&libraries=drawing&callback=initMap"></script>
 </html>
