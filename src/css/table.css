@@ -95,7 +95,7 @@ table.table.table-hover.dataTable.no-footer{
     height: 0px;
 }
 ::-webkit-scrollbar-thumb {
-    background: #5353c6;
+        background: #5353c6;
     border: 0px none #333399;
     border-radius: 84px;
 }

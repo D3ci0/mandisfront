@@ -64,10 +64,10 @@
                         <div class="menu-primary-container">
 
                             <ul class="menu nav-menu" id="menu-primary">
-                                <li class="active">
+                                <li>
                                     <a href="inserimento.html">Sorgente</a>
                                 </li>
-                                <li>
+                                <li class="active">
                                     <a href="inserimento-diagnosi.html">Diagnosi</a>
                                 </li>
                             </ul>
@@ -124,26 +124,31 @@
                 </div>
             </div>
 
-            <div class="col-md-2">
-                <label>Data Inizio</label>
-                <div id="data_inizio" class="input-group date" data-provide="datepicker">
-                    <input id="data_inizio_input" type="text" class="form-control"  placeholder="Seleziona la data di inizio">
-                    <div class="input-group-addon">
-                        <span class="glyphicon glyphicon-th"></span>
+            <div class="form-group">
+                <div class="col-md-2">
+                    <label for="patologie">Patologia</label>
+                    <select class="form-control" id="patologie">
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label>Indirizzo paziente</label>
+                    <div id="indirizzo">
+                        <input id="indirizzo_input" type="text" class="form-control" onFocus="geolocate()"  placeholder="Inserisci l'indirizzo">
+                    </div>
+                </div>
+
+                <div class="col-md-2" style="margin-top: 10px;">
+                    <label>Data Diagnosi</label>
+                    <div id="data_inizio" class="input-group date" data-provide="datepicker">
+                        <input id="data_inizio_input" type="text" class="form-control"  placeholder="Seleziona la data">
+                        <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-th"></span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-2">
-
-                <label>Data Fine</label>
-                <div id="data_fine" class="input-group date" data-provide="datepicker">
-                    <input id="data_fine_input" type="text" class="form-control" placeholder="Seleziona la data di fine" disabled="true">
-                    <div class="input-group-addon">
-                        <span class="glyphicon glyphicon-th"></span>
-                    </div>
-                </div>
-            </div>
 
             <div class="col-md-5" style="margin-top: 20px;">
                 <fieldset>
@@ -172,10 +177,11 @@
 <script>
     var shapes = [];
     var src_loaded = null;
-    var circle;
     var map;
     var drawingManager=null;
     var geoJson=null;
+    var autocomplete;
+    var marker;
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -186,34 +192,26 @@
             zoom: 9
         });
 
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('indirizzo_input')),
+            {types: ['geocode']});
+
+        // When the user selects an address from the dropdown, populate the address
+        // fields in the form.
+        autocomplete.addListener('place_changed', addMarker);
+
         drawingManager = new google.maps.drawing.DrawingManager({
-            drawingMode: google.maps.drawing.OverlayType.POLYGON,
+            drawingMode: google.maps.drawing.OverlayType.MARKER,
             drawingControl: true,
             drawingControlOptions: {
                 position: google.maps.ControlPosition.TOP_CENTER,
-                drawingModes: ['circle', 'polygon', 'polyline']
+                drawingModes: ['marker']
             },
-            markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
-            circleOptions: {
-                fillColor: '#06ff8f',
-                strokeColor: '#0b9c07',
-                strokeWeight: 2.5,
-                clickable: false,
-                editable: true,
-                zIndex: 1
-            },
-            polygonOptions: {
-                fillColor: '#06ff8f',
-                strokeColor: '#0b9c07',
-                strokeWeight: 2.5,
-                editable: true
-            },
-            polylineOptions: {
-                fillColor: '#06ff8f',
-                strokeColor: '#0b9c07',
-                strokeWeight: 2.5,
-                editable: true
-            }
+                markerOptions: {icon: "http://www.clker.com/cliparts/o/t/F/J/B/k/google-maps-th.png"}
+
+
 
         });
 
@@ -221,10 +219,10 @@
 
         // Add a listener for creating new shape event.
         google.maps.event.addListener(drawingManager, "overlaycomplete", function (event) {
+            reset_marker();
             var newShape = event.overlay;
             newShape.type = event.type;
             shapes.push(newShape);
-            addEditListener(newShape);
             geoJson = exportGeoJson(newShape);
             sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
             if (drawingManager.getDrawingMode()) {
@@ -232,58 +230,16 @@
             }
         });
 
-        //Add a listener for shape changing
-        function addEditListener(shape){
-            newShape = shape;
-            switch (newShape.type){
-                case google.maps.drawing.OverlayType.CIRCLE: {
-                    newShape.addListener("radius_changed", function(){
-                        geoJson = exportGeoJson(newShape);
-                        sessionStorage.removeItem('geoJson');
-                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
-                    });
 
-                    newShape.addListener("center_changed", function(){
-                        geoJson = exportGeoJson(newShape);
-                        sessionStorage.removeItem('geoJson');
-                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
-                    });
-                    break;
-                }
-
-                case google.maps.drawing.OverlayType.RECTANGLE: {
-                    newShape.addListener("bounds_changed", function(){
-                        geoJson = exportGeoJson(newShape);
-                        sessionStorage.removeItem('geoJson');
-                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
-                    });
-                    break;
-                }
-
-                case google.maps.drawing.OverlayType.POLYLINE: {
-                    newShape.getPath().addListener("set_at", function(){
-                        geoJson = exportGeoJson(newShape);
-                        sessionStorage.removeItem('geoJson');
-                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
-                    });
-
-                    newShape.getPath().addListener("insert_at", function(){
-                        geoJson = exportGeoJson(newShape);
-                        sessionStorage.removeItem('geoJson');
-                        sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
-                    });
-                    break;
-                }
-            }
-            sessionStorage.setItem('geoJson', JSON.stringify(geoJson));
-        };
 
         // add a listener for the drawing mode change event, delete any existing polygons
         google.maps.event.addListener(drawingManager, "drawingmode_changed", function () {
             if (drawingManager.getDrawingMode() != null) {
                 reset_search();
+                reset_marker();
             }
         });
+
 
         get_sorgenti();
         get_diagnosi();
@@ -299,29 +255,41 @@
 
     //diagnosi controller begins
     app.controller('diagnosi_controller', function($scope, $filter, $http) {
-        var date_error = 'Inserisci date valide.';
-        var shape_error = 'Disegna sulla mappa un poligono, un cerchio o una linea da inserire.';
+        var date_error = 'Inserisci una data valida.';
+        var shape_error = 'Inserisci un indirizzo valido.';
+        var patologia_error = 'Inserisci una patologia valida.'
         $scope.insert = function() {
             if(validate_shape() == null){
                 show_error(shape_error);
                 return;
             }
 
-            if(validate_date() == false ){
+            if(validate_date_diagnosi() == false ){
                 show_error(date_error);
                 return;
             }
 
+            if(validate_patologia() == false){
+                show_error(patologia_error);
+                return;
+            }
+
+
+            var selection = document.getElementById('patologie');
+            var selected = selection.options[selection.selectedIndex].value;
+
             showPleaseWait();
 
             var json = {
-                'data_inizio': document.getElementById('data_inizio_input').value,
-                'data_fine': document.getElementById('data_fine_input').value,
+                'data_diagnosi': document.getElementById('data_inizio_input').value,
+                'patologia': selected,
                 'features': sessionStorage.getItem('geoJson')
             };
 
+            console.log(JSON.stringify(json));
+
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            $http.post("https://floating-lowlands-19121.herokuapp.com/inserisci_sorgente/", json).then(function () {
+            $http.post("https://floating-lowlands-19121.herokuapp.com/inserisci_diangosi/", json).then(function () {
                 reset_search();
                 reset_input();
                 hidePleaseWait();
@@ -343,6 +311,57 @@
 
 
 <script>
+    // Bias the autocomplete object to the user's geographical location,
+    // as supplied by the browser's 'navigator.geolocation' object.
+    function geolocate() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var geolocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                var circle = new google.maps.Circle({
+                    center: geolocation,
+                    radius: position.coords.accuracy
+                });
+                autocomplete.setBounds(circle.getBounds());
+            });
+        }
+    }
+
+    function addMarker(){
+        var place = autocomplete.getPlace();
+
+        marker = new google.maps.Marker({
+            map: map,
+            icon: "http://www.clker.com/cliparts/o/t/F/J/B/k/google-maps-th.png"
+        });
+        marker.set("type", "marker");
+
+        reset_map_drawing();
+
+        if (!place.geometry) {
+            // User entered the name of a Place that was not suggested and
+            // pressed the Enter key, or the Place Details request failed.
+            window.alert("Nessun risultato per l'indirizzo inserito");
+            return;
+        }
+
+        // If the place has a geometry, then present it on a map.
+        if (place.geometry.viewport) {
+            map.fitBounds(place.geometry.viewport);
+        } else {
+            map.setCenter(place.geometry.location);
+            map.setZoom(16);
+        }
+        marker.setPosition(place.geometry.location);
+        marker.setVisible(true);
+
+        geoJson = exportGeoJson(marker);
+        sessionStorage.setItem('geoJson',JSON.stringify(geoJson));
+
+    }
+
     $(document).ready(function(){
         reset_input();
         reset_search();
@@ -350,6 +369,8 @@
 
     $('#reset_btn').click(function () {
         reset_input();
+        reset_marker();
+        reset_map_viewport();
     });
 
     $(document).ready(function() {
@@ -361,24 +382,40 @@
             todayBtn: "linked",
             autoclose: true,
             todayHighlight: true
-        }).on('changeDate', function(date_selected){
-            var date = new Date(date_selected.date.valueOf());
-            $('#data_fine_input').prop('disabled', false);
-            $('#data_fine').bootstrapDP('setStartDate', date);
-        });
-        $("#data_fine").bootstrapDP({
-            autoclose:true,
-            todayBtn: "linked",
-            format: 'dd/mm/yyyy',
-            todayHighlight: true
         });
     });
 
-    function reset_input(){
-        document.getElementById('data_inizio_input').value = "";
-        document.getElementById('data_fine_input').value = "";
+    function reset_map_viewport(){
+        map.setCenter({
+            lat: 41.066927730193456,
+            lng: 14.330291748046875
+        });
+        map.setZoom(9);
     }
 
+    function reset_input(){
+        document.getElementById('data_inizio_input').value = "";
+        document.getElementById('indirizzo_input').value = "";
+        $('#patologie option').prop('selected', function() {
+            return this.defaultSelected;
+        });
+    }
+
+    function reset_marker(){
+        if(marker)
+            marker.setPosition(null);
+    }
+
+    function validate_patologia(){
+        var selection = document.getElementById('patologie');
+        var selected = selection.options[selection.selectedIndex].value;
+        return selected!="Seleziona";
+    }
+
+    function validate_date_diagnosi(){
+        var data_inizio = $("#data_inizio_input").val();
+        return (data_inizio != "");
+    }
 
     function get_sorgenti(){
         if(src_loaded != null){
@@ -402,6 +439,20 @@
         });
     }
 
+    $.ajax({
+        url : 'https://floating-lowlands-19121.herokuapp.com/patologie/',
+        type : 'GET',
+        datatype : 'json',
+        success : function(data) {
+            data = JSON.parse(data);
+            var options= "<option value='Seleziona' selected='selected'>Seleziona</option>";
+            for (var i = 0; i < data['length']; i++) {
+                options += "<option value='" + data[i] + "'>" + data[i] + "</option>";
+            }
+            $("#patologie").append(options);
+        }
+    });
+<!-- Fine combobox dinamica-->
 
     function get_diagnosi() {
         $.ajax({
@@ -415,5 +466,5 @@
     }
 
 </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&libraries=drawing&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCra5AQ9_m4TUQRk-iVIBRKoIQvNyRsc2E&libraries=drawing,places&callback=initMap"></script>
 </html>

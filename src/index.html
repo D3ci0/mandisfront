@@ -31,10 +31,10 @@
                 </div>
                 <ul id="navbar-menu" class="nav navbar-nav">
                     <li>
-                        <a href="home-area.html">Ricerca</a>
+                        <a style="font-size: 16px" href="home-area.html">Ricerca</a>
                     </li>
                     <li>
-                        <a href="inserimento.html">Inserimento</a>
+                        <a style="font-size: 16px" href="inserimento.html">Inserimento</a>
                     </li>
                 </ul>
             </div><!--/.nav-collapse -->
@@ -48,7 +48,7 @@
         <h1 class = "jumbotron-heading" style="color: #4169e1">
             Mandis
         </h1>
-        <p style="color: #222222" class = "lead text-muted">Ufficio stampa pensaci tu</p>
+        <p id="text_home" class = "lead text-dark"></p>
     </div>
 </section>
 
@@ -57,15 +57,15 @@
         <div class="col-lg-4 col-lg-offset-2 text-center">
             <img class="rounded-circle" src="https://image.ibb.co/ms28sS/search_14_128.png">
             <h2>Ricerca</h2>
-            <p>Testo per spiegare la ricerca.</p>
+            <p id="text_ricerca"></p>
             <p>
                 <a class="btn btn-primary" href="home-area.html" role="button">Ricerca</a>
             </p>
         </div>
         <div class="col-lg-4 text-center">
-            <img class="rounded-circle" src="https://image.ibb.co/jdmez7/cloud_computing.png">
+            <img class="rounded-circle" src="https://image.ibb.co/i6Ewe7/cloud_computing_4169e1.png">
             <h2>Inserimento</h2>
-            <p>Testo per spiegare l'inserimento.</p>
+            <p id="text_inserisci"></p>
             <p>
                 <a class="btn btn-primary" href="inserimento.html" role="button">Inserisci</a>
             </p>
@@ -75,6 +75,11 @@
 </body>
 
 <script>
+    $(document).ready(function(){
+        document.getElementById("text_home").innerHTML = text_home;
+        document.getElementById("text_inserisci").innerHTML = text_inserimento;
+        document.getElementById("text_ricerca").innerHTML = text_ricerca;
+    });
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
             center: {

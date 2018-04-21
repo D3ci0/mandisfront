@@ -113,7 +113,10 @@
 
 .navbar.navbar-default.navbar-fixed-top{
     background-color: #5353c6;
-    border-bottom-color: #5353c6
+    border-bottom-color: #5353c6;
+    -webkit-box-shadow:0px 1px 1px #5353c6;
+    -moz-box-shadow:0px 1px 1px #5353c6;
+    box-shadow:0px 1px 1px #5353c6;
 }
 
 #navbar-menu li > a{
@@ -127,5 +130,8 @@
 
 #navbar > .navbar-header > a {
     color: whitesmoke;
+    font-size: 34px;
 }
+
+
 

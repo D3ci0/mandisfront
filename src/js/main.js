@@ -1,3 +1,13 @@
+
+var text_home = "Il sistema Mandis nasce con l'intenzione di monitorare le principali sorgenti di inquinamento Italiane con lo scopo di trovare correlazioni tra esse ed alcune patologie diagnosticate su tutto il territorio. \
+Molte patologie croniche sono state correlate, ad esempio, alla qualità dell'aria. La ricerca in questa direzione potrebbe offrire numerosi vantaggi volti a migliorare la qualità della nostra vita e a garantire un maggiore sviluppo economico e sociale per il paese.\
+Il sistema, sviluppato per l'ente territoriale 'enteUnina', mette a disposizione degli utilizzatori una mappa sulla quale sono rappresentate le posizioni delle sorgenti di inquinamento identificate (attive e non più attive), oltre alla posizione di diverse patologie diagnosticate (rappresentate dall'indirizzo del soggetto malato).\
+Il sistema è stato sviluppato da Danilo Ciano e Yuri Attanasio, studenti del Corso Magistale di Informatica dell'università Federico II di Napoli.";
+
+var text_ricerca = "Tramite strumenti di ricerca geografica, il sistema permette di effettuare diverse tipologie di ricerca al fine di analizzare possibili correlazioni tra sorgente e patologia.";
+
+var text_inserimento = "Il sistema permette l'aggiunta di nuove sorgenti e nuove diagnosi al fine di popolare e mantenere sempre aggiornato il database.";
+
 /*   Displays overlay with "Please wait" text. Based on bootstrap modal. Contains animated progress bar.  */
 function showPleaseWait() {
     var modalLoading = '<div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false role="dialog">\
@@ -88,6 +98,12 @@ function exportGeoJson(shape) {
     };
     var arr = [];
     switch (shape.type) {
+        case google.maps.drawing.OverlayType.MARKER:{
+            shapeFeature.geometry.coordinates.push(shape.position.lng(), shape.position.lat());
+            shapeFeature.geometry.type = "point";
+            geoJson.features.push(shapeFeature);
+            break;
+        }
         case google.maps.drawing.OverlayType.POLYLINE:{
             for (var i = 0; i < shape.getPath().getLength(); i++) {
                 var pt = shape.getPath().getAt(i);
