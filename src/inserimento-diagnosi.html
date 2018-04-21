@@ -289,7 +289,7 @@
             console.log(JSON.stringify(json));
 
             //Query sorgenti di inquinamento più vicine all'area indicata sulla mappa
-            $http.post("https://floating-lowlands-19121.herokuapp.com/inserisci_diangosi/", json).then(function () {
+            $http.post("https://floating-lowlands-19121.herokuapp.com/inserisci_diagnosi/", json).then(function () {
                 reset_search();
                 reset_input();
                 hidePleaseWait();
