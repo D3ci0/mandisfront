@@ -70,6 +70,11 @@
                                 <li>
                                     <a href="inserimento-diagnosi.html">Diagnosi</a>
                                 </li>
+                                <li>
+                                    <a style="height: 59px">
+                                        <button onclick="tip()" style="outline:none;background:none;border:none"><i class="glyphicon glyphicon-question-sign"> </i></button>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -79,9 +84,9 @@
         <div class="slider-wrapper"></div>
     </div>
 
-    <div class="col-md-5" style="margin-top: 15px;">
+    <div id="tip" class="col-md-5" style="display: none">
         <div class="alert alert-info">
-            <strong>Info!</strong> Spiegare come funziona l'inserimento.
+            <strong>Info!</strong> Disegna una sorgente sulla mappa e inserisci la data di inizio ed (eventualmente) quella di fine.
         </div>
     </div>
 

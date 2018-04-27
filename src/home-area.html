@@ -71,6 +71,11 @@
                                 <li>
                                     <a href="home.html">Diagnosi</a>
                                 </li>
+                                <li>
+                                    <a style="height: 59px">
+                                    <button onclick="tip()" style="outline:none;background:none;border:none"><i class="glyphicon glyphicon-question-sign"> </i></button>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -81,9 +86,9 @@
         <div class="slider-wrapper"></div>
     </div>
 
-    <div class="col-md-5">
+    <div id="tip" class="col-md-5" style="display: none">
         <div class="alert alert-info">
-            <strong>Info!</strong> Spiegare come funziona la ricerca.
+            <strong>Info!</strong> Disegnare un'area sulla mappa e cliccare il tasto Cerca. Verranno mostrate tutte le patologie più frequenti all'interno dell'area disegnata e tutte le sorgenti di inquinamento più vicine.
         </div>
     </div>
 
@@ -96,7 +101,7 @@
         <div class="col-md-5">
             <fieldset>
             <legend>
-                Ricerca sorgenti
+                Ricerca diagnosi e sorgenti più vicine
             </legend>
             </fieldset>
         </div>

@@ -74,6 +74,11 @@
                                 <li>
                                     <a href="home.html">Diagnosi</a>
                                 </li>
+                                <li>
+                                    <a style="height: 59px">
+                                        <button onclick="tip()" style="outline:none;background:none;border:none"><i class="glyphicon glyphicon-question-sign"> </i></button>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -83,9 +88,9 @@
         <div class="slider-wrapper"></div>
     </div>
 
-    <div class="col-md-5">
+    <div id="tip" class="col-md-5" style="display: none">
         <div class="alert alert-info">
-            <strong>Info!</strong> Spiegare come funziona la ricerca.
+            <strong>Info!</strong> Inserire una distanza in Km e selezionare la lente di ingrandimento su una delle sorgenti presenti nella tabella Lista Sorgenti. Verranno mostrate tutte le diagnosi più frequenti all'interno della distanza scelta.
         </div>
     </div>
 
@@ -93,22 +98,19 @@
         <div class="col-md-5">
             <fieldset>
                 <legend>
-                    Ricerca diagnosi
+                    Ricerca diagnosi più frequenti
                 </legend>
             </fieldset>
         </div>
         <div ng-app = "mandis" ng-controller = "sorgente_controller" id="sorgente_ctrl">
-            <div class="col-md-4 form-group">
+            <div class="col-md-4 form-group" style="margin-top: -15px;">
                 <div class="row">
                     <div class="form-group"></div>
                     <label class="col-md-2 control-label">Distanza(Km)</label>
                 </div>
                 <div class="row inputGroupContainer">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <input type = "text" name="distanza" id="select_distanza" value="" placeholder="Inserisci la distanza">
-                            </input>
-                        </div>
+                    <div class="col-md-4" >
+                        <input type = "text" class="form-control" name="distanza" id="select_distanza" value="" placeholder="Inserisci la distanza">
                     </div>
                 </div>
             </div>

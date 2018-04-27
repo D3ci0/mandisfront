@@ -34,6 +34,13 @@ function hide_error(){
     }
 }
 
+function tip(){
+    $('#tip').animate({
+        height: "toggle",
+        opacity: "toggle"
+    }, 1000);
+}
+
 function show_success(){
     $('#success_alert').animate({
         height: "toggle",

@@ -86,7 +86,8 @@
 
 /*Validator icon position fix*/
 .form-control-feedback {
-    line-height: 27px !important;
+    line-height: 33px !important;
+    margin-right: 12px !important;
   }
 /*modal dialog position fix*/
 .modal-dialog { position: absolute; left: 0; right: 0; top: 40%; bottom: 0; margin: auto; }

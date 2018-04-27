@@ -70,6 +70,11 @@
                                 <li class="active">
                                     <a href="inserimento-diagnosi.html">Diagnosi</a>
                                 </li>
+                                <li>
+                                    <a style="height: 59px">
+                                        <button onclick="tip()" style="outline:none;background:none;border:none"><i class="glyphicon glyphicon-question-sign"> </i></button>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -79,9 +84,9 @@
         <div class="slider-wrapper"></div>
     </div>
 
-    <div class="col-md-5" style="margin-top: 15px;">
+    <div id="tip" class="col-md-5" style="display: none">
         <div class="alert alert-info">
-            <strong>Info!</strong> Spiegare come funziona l'inserimento.
+            <strong>Info!</strong> Per l'indirizzo del paziente è possibile selezionare un punto sulla mappa o inserirlo manualmente nell'apposita textbox.
         </div>
     </div>
 
@@ -183,6 +188,7 @@
     var autocomplete;
     var marker;
 
+
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
             center: {
@@ -202,6 +208,12 @@
         // fields in the form.
         autocomplete.addListener('place_changed', addMarker);
 
+        var icon = {
+            url: 'http://www.clker.com/cliparts/R/g/O/v/U/h/google-maps-marker-for-residencelamontagne-md.png',
+            scaledSize: new google.maps.Size(30, 50),
+        };
+
+
         drawingManager = new google.maps.drawing.DrawingManager({
             drawingMode: google.maps.drawing.OverlayType.MARKER,
             drawingControl: true,
@@ -209,7 +221,7 @@
                 position: google.maps.ControlPosition.TOP_CENTER,
                 drawingModes: ['marker']
             },
-                markerOptions: {icon: "http://www.clker.com/cliparts/o/t/F/J/B/k/google-maps-th.png"}
+                markerOptions: {icon: icon}
 
 
 
@@ -332,9 +344,14 @@
     function addMarker(){
         var place = autocomplete.getPlace();
 
+        var icon = {
+            url: 'http://www.clker.com/cliparts/R/g/O/v/U/h/google-maps-marker-for-residencelamontagne-md.png',
+            scaledSize: new google.maps.Size(30, 50),
+        };
+
         marker = new google.maps.Marker({
             map: map,
-            icon: "http://www.clker.com/cliparts/o/t/F/J/B/k/google-maps-th.png"
+            icon: icon
         });
         marker.set("type", "marker");
 

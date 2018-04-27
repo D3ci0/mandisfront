@@ -74,6 +74,11 @@
 										<li class="active">
 											<a href="home.html">Diagnosi</a>
 										</li>
+                                        <li>
+                                            <a style="height: 59px">
+                                                <button onclick="tip()" style="outline:none;background:none;border:none"><i class="glyphicon glyphicon-question-sign"> </i></button>
+                                            </a>
+                                        </li>
 									</ul>
 								</div>
 							</div>
@@ -83,9 +88,9 @@
                 <div class="slider-wrapper"></div>
 			</div>
 
-            <div class="col-md-5">
+            <div id="tip" class="col-md-5" style="display: none">
                 <div class="alert alert-info">
-                    <strong>Info!</strong> Spiegare come funziona la ricerca.
+                    <strong>Info!</strong> Inserire una distanza in Km e selezionare la lente di ingrandimento su una delle diagnosi presenti nella tabella Lista diagnosi. Verranno mostrate tutte le sorgenti che si trovano entro la distanza scelta.
                 </div>
             </div>
 
@@ -93,7 +98,7 @@
 				<div class="col-md-5">
 					<fieldset>
 					<legend>
-						Ricerca sorgenti
+						Ricerca sorgenti più vicine
 					</legend>
 					</fieldset>
 				</div>
@@ -103,9 +108,8 @@
                             <label class="col-md-2 control-label">Distanza(Km)</label>
                         </div>
                         <div class="row inputGroupContainer">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <input type = "text" name="distanza" id="select_distanza" value="" placeholder="Inserisci la distanza">
+                            <div class="col-md-4">
+                                    <input type = "text" class="form-control" name="distanza" id="select_distanza" value="" placeholder="Inserisci la distanza">
                                     </input>
                                 </div>
                             </div>
