@@ -78,8 +78,13 @@ function validate_date(){
     var data_fine_array = data_fine.split("/");
     var data_fine_date = new Date(data_fine_array[2], data_fine_array[1]-1, data_fine_array[0]);
 
+    if(data_fine == "" && data_inizio != ""){
+        return true;
+    }
+
     if(data_fine_date > data_inizio_date)
         return true;
+
     return false;
 }
 
