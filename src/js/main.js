@@ -223,9 +223,87 @@ function lineari_func(checkbox_l) {
     }
 }
 
+function show_infowindow(event, infowindow){
+    contentString = null;
+    console.log(event.feature.getGeometry().getType());
+    switch(event.feature.getGeometry().getType()){
+        case "Polygon":{
+            contentString = get_source_string(event);
+            infowindow.setPosition(event.feature.getGeometry().getAt(0).getAt(0));
+            infowindow.setContent(contentString);
+            infowindow.open(map);
+            break;
+        }
+        case "LineString":{
+            contentString = get_source_string(event);
+            infowindow.setPosition(event.feature.getGeometry().getAt(0));
+            infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
+            infowindow.setContent(contentString);
+            infowindow.open(map);
+            break;
+        }
+    }
+}
+
+function get_source_string(event){
+    var data_inizio = new Date(event.feature.getProperty('data_inizio'));
+    var data_fine = null;
+    if(event.feature.getProperty('data_fine')!= null) {
+        data_fine = new Date(event.feature.getProperty('data_fine'));
+    }
+    string = '<div id="content">'+
+        '<h3 style="font-size: small" id="firstHeading" class="firstHeading">Informazioni sulla sorgente</h3>'+
+        '<table class="table table-sm" style="border-bottom:none">'+
+            '<tbody >'+
+                '<tr>'+
+                    '<th> Data Inizio </th>'+
+                    '<td>'+ ddMMyyyyDate(data_inizio) +'</td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<th> Data Fine </th>'+
+                    '<td>'+ ddMMyyyyDate(data_fine) +'</td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<th> Tipologia </th>'+
+                    '<td>'+ tipologia(event) +'</td>'+
+                '</tr>'+
+            '</tbody>'+
+        '</table>'+
+        '</div>';
+
+    return string;
+}
+
+function tipologia(event){
+    var tipologia = null;
+    switch (event.feature.getGeometry().getType()){
+        case "Polygon":{
+            if(event.feature.getProperty('raggio') != null)
+                tipologia = "Circolare";
+            else
+                tipologia = "Poligonale"
+            break;
+        }
+        case "LineString":{
+            tipologia = "Lineare"
+            break;
+        }
+    }
+    return tipologia;
+}
+
 function are_you_sure(){
     $("#areYouSureDialog").modal("show");
 }
+
+function ddMMyyyyDate(inputFormat) {
+    if(inputFormat == null)
+        return null;
+    function pad(s) { return (s < 10) ? '0' + s : s; }
+    var d = new Date(inputFormat);
+    return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/');
+}
+
 
 /** Loader with progress bar */
 /*

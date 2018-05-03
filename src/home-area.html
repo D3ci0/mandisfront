@@ -182,6 +182,7 @@
     var polygon_overlay=null;
     var drawingManager=null;
     var geoJson=null;
+    var added_sources = null;
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -191,6 +192,8 @@
             },
             zoom: 9
         });
+
+        var infowindow = new google.maps.InfoWindow();
 
         drawingManager = new google.maps.drawing.DrawingManager({
             drawingMode: google.maps.drawing.OverlayType.POLYGON,
@@ -291,6 +294,11 @@
             }
         });
 
+        map.data.addListener('click', function(event){
+            show_infowindow(event, infowindow);
+        });
+
+
 
     }
 
@@ -299,7 +307,10 @@
         dataType : "json",
         url : "https://floating-lowlands-19121.herokuapp.com/sorgenti/",
         success : function(data) {
-            map.data.addGeoJson(JSON.parse(data));
+            added_sources = map.data.addGeoJson(JSON.parse(data));
+            for(var i=0; i<added_sources.length; i++){
+
+            }
             map.data.setStyle(function() {
                 return ( {
                     fillColor : "red",
@@ -559,6 +570,8 @@ var polygon_clicked_overlay=null;
         reset_localStorage_sorgenti();
         hide_error();
     }
+
+
 
     //Evidenzia sulla mappa la sorgente relativa alla riga della tabella sorgenti cliccata
     function poly_clicked(poly){
