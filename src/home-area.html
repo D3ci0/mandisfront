@@ -307,10 +307,7 @@
         dataType : "json",
         url : "https://floating-lowlands-19121.herokuapp.com/sorgenti/",
         success : function(data) {
-            added_sources = map.data.addGeoJson(JSON.parse(data));
-            for(var i=0; i<added_sources.length; i++){
-
-            }
+            map.data.addGeoJson(JSON.parse(data));
             map.data.setStyle(function() {
                 return ( {
                     fillColor : "red",
@@ -337,7 +334,7 @@
     var app = angular.module('mandis', ['LocalStorageModule']);
 
     //diagnosi controller begins
-    app.controller('diagnosi_controller', function($scope, $filter, $http) {
+    app.controller('diagnosi_controller', function($scope, $filter, $http, $window) {
 
         $scope.search = function() {
 
@@ -367,6 +364,9 @@
                 polygon_overlay = new google.maps.Data(map);
                 polygon_overlay.setMap(map);
                 polygon_overlay.addGeoJson(JSON.parse(response.data));
+                polygon_overlay.addListener('click', function(event){
+                    show_infowindow(event, $window.infowindow);
+                });
                 polygon_overlay.setStyle(function() {
                     return ( {
                         fillColor : "blue",
