@@ -157,7 +157,6 @@
 
             $http.get("https://floating-lowlands-19121.herokuapp.com/diagnosi/").then(function (response) {
                 $scope.diagnosi = JSON.parse(response.data).features;
-                console.log($scope.diagnosi);
             }, function (err) {
                 alert(err);
             });

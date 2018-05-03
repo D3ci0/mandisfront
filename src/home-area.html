@@ -154,14 +154,14 @@
                     <table id="sorgenti_tab" class="table table-hover">
                         <thead class="thead">
                             <tr>
-                                <th>Distanza</th>
+                                <th>Distanza(Km)</th>
                                 <th>Data Inizio</th>
                                 <th>Data Fine</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="x in sorgenti"  ng-click="evidenzia_poligono(x)">
-                                <td>{{x.properties.distanza}}</td>
+                                <td>{{x.properties.distanza/1000 | number : 3}}</td>
                                 <td>{{x.properties.data_inizio | date:"dd/MM/yyyy"}}</td>
                                 <td>{{x.properties.data_fine | date:"dd/MM/yyyy"}}</td>
                             </tr>
