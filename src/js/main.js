@@ -225,7 +225,6 @@ function lineari_func(checkbox_l) {
 
 function show_infowindow(event, infowindow){
     contentString = null;
-    console.log(event.feature.getGeometry().getType());
     switch(event.feature.getGeometry().getType()){
         case "Polygon":{
             contentString = get_source_string(event);
@@ -237,7 +236,13 @@ function show_infowindow(event, infowindow){
         case "LineString":{
             contentString = get_source_string(event);
             infowindow.setPosition(event.feature.getGeometry().getAt(0));
-            infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
+            infowindow.setContent(contentString);
+            infowindow.open(map);
+            break;
+        }
+        case "Point":{
+            contentString = get_diagnosi_string(event);
+            infowindow.setPosition({lat: event.feature.getGeometry().get().lat(), lng: event.feature.getGeometry().get().lng()});
             infowindow.setContent(contentString);
             infowindow.open(map);
             break;
@@ -274,6 +279,32 @@ function get_source_string(event){
     return string;
 }
 
+function get_diagnosi_string(event){
+    var data_diagnosi = new Date(event.feature.getProperty('data_diagnosi'));
+
+    string = '<div id="content">'+
+        '<h3 style="font-size: small" id="firstHeading" class="firstHeading">Informazioni sulla diagnosi</h3>'+
+            '<table class="table table-sm" style="border-bottom:none">'+
+                '<tbody >'+
+                    '<tr>'+
+                    '   <th> Data Diagnosi </th>'+
+                    '   <td>'+ ddMMyyyyDate(data_diagnosi) +'</td>'+
+                    '</tr>'+
+                    '<tr>'+
+                        '<th> Patologia </th>'+
+                        '<td>'+ event.feature.getProperty('patologia') +'</td>'+
+                    '</tr>'+
+                    '<tr>'+
+                        '<th> Tipologia </th>'+
+                        '<td>'+ tipologia(event) +'</td>'+
+                    '</tr>'+
+                '</tbody>'+
+            '</table>'+
+        '</div>';
+
+    return string;
+}
+
 function tipologia(event){
     var tipologia = null;
     switch (event.feature.getGeometry().getType()){
@@ -286,6 +317,10 @@ function tipologia(event){
         }
         case "LineString":{
             tipologia = "Lineare"
+            break;
+        }
+        case "Point":{
+            tipologia = "Diagnosi"
             break;
         }
     }
