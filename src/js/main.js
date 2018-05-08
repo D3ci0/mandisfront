@@ -8,6 +8,8 @@ var text_ricerca = "Tramite strumenti di ricerca geografica, il sistema permette
 
 var text_inserimento = "Il sistema permette l'aggiunta di nuove sorgenti e nuove diagnosi al fine di popolare e mantenere sempre aggiornato il database.";
 
+var feature = null;
+
 /*   Displays overlay with "Please wait" text. Based on bootstrap modal. Contains animated progress bar.  */
 function showPleaseWait() {
     var modalLoading = '<div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false role="dialog">\
@@ -223,18 +225,18 @@ function lineari_func(checkbox_l) {
     }
 }
 
-function show_infowindow(event, infowindow){
+function show_infowindow(event, infowindow, content){
     contentString = null;
     switch(event.feature.getGeometry().getType()){
         case "Polygon":{
-            contentString = get_source_string(event);
+            contentString = content;
             infowindow.setPosition(event.feature.getGeometry().getAt(0).getAt(0));
             infowindow.setContent(contentString);
             infowindow.open(map);
             break;
         }
         case "LineString":{
-            contentString = get_source_string(event);
+            contentString = content;
             infowindow.setPosition(event.feature.getGeometry().getAt(0));
             infowindow.setContent(contentString);
             infowindow.open(map);
@@ -248,6 +250,154 @@ function show_infowindow(event, infowindow){
             break;
         }
     }
+    inizializza_validator();
+}
+
+function inizializza_validator(){
+    /*$(document).ready(function() {
+        $('#ricerca_sorgenti_infowindow').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                distanza_infowindow: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Inserisci la distanza'
+                        },
+                        numeric: {
+                            message: 'Distanza non valida'
+                        }
+                    }
+                }
+            }
+        });
+    });*/
+    $.validate({lang: 'it'});
+}
+
+function get_source_button_string(event){
+    var data_inizio = new Date(event.feature.getProperty('data_inizio'));
+    feature = event.feature;
+    var data_fine = null;
+    if(event.feature.getProperty('data_fine')!= null) {
+        data_fine = new Date(event.feature.getProperty('data_fine'));
+    }
+        string =    '<form id="ricerca_sorgenti_infowindow">' +
+                        '<div id="content">'+
+                            '<h3 style="font-size: small" id="firstHeading" class="firstHeading">Informazioni sulla sorgente</h3>'+
+                                '<table class="table table-sm" style="border-bottom:none">'+
+                                    '<tbody >'+
+                                        '<tr>'+
+                                            '<th> Data Inizio </th>'+
+                                            '<td>'+ ddMMyyyyDate(data_inizio) +'</td>'+
+                                        '</tr>'+
+                                        '<tr>'+
+                                            '<th> Data Fine </th>'+
+                                            '<td>'+ ddMMyyyyDate(data_fine) +'</td>'+
+                                        '</tr>'+
+                                        '<tr>'+
+                                            '<th> Tipologia </th>'+
+                                            '<td>'+ tipologia(event) +'</td>'+
+                                        '</tr>'+
+                                    '</tbody>'+
+                                '</table>'+
+                            '<input type = "text" class="form-control" id="select_distanza_infowindow" value="" data-validation="number" data-validation-allowing="positive" placeholder="Inserisci la distanza">'+
+                            '<button style="width: 100%; margin-top:10px" id="search_btn" class="btn btn-primary"  onclick="infowindow_search(); return false;">'+
+                            'Cerca'+
+                            '</button>'+
+                        '</div>'+
+                    '</form>';
+
+    return string;
+}
+
+function export_json(){
+    var shapeFeature = {
+        "type": "Feature",
+        "geometry": {
+            "type": "",
+            "coordinates": []
+        },
+        "properties": {}
+    };
+
+    var arr = [];
+
+
+    if(feature.getGeometry().getType() == "Polygon"){
+        for(var i=0;i<feature.getGeometry().getAt(0).getLength();i++){
+            var pt = feature.getGeometry().getAt(0).getAt(i);
+            arr.push([pt.lng(), pt.lat()]);
+        }
+        var pt = feature.getGeometry().getAt(0).getAt(0);
+        arr.push([pt.lng(), pt.lat()]);
+        shapeFeature.geometry.coordinates.push(arr);
+        shapeFeature.geometry.type = "Polygon";
+    }else if(feature.getGeometry().getType() == "LineString"){
+        for(var i=0;i<feature.getGeometry().getLength();i++){
+            var pt = feature.getGeometry().getAt(i);
+            shapeFeature.geometry.coordinates.push([pt.lng(), pt.lat()]);
+        }
+        shapeFeature.geometry.type = "linestring";
+    }
+
+    return shapeFeature;
+}
+
+function infowindow_search(){
+    var distanza = Number(document.getElementById('select_distanza_infowindow').value);
+    var feature_json = export_json();
+    if(isNaN(distanza) == false && distanza>0) {
+        showPleaseWait();
+        var json = {
+            'distanza': distanza,
+            'features': feature_json
+        };
+
+        console.log(json);
+
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            data : JSON.stringify(json),
+            url : "https://floating-lowlands-19121.herokuapp.com/ricerca_diagnosi_per_sorgente/",
+            success : function(data) {
+                hidePleaseWait();
+                var parsed_data = JSON.parse(data);
+                add_data_to_table(parsed_data);
+            },
+            error : function(err){
+                alert(err);
+                hidePleaseWait();
+            }
+        });
+
+    }
+}
+
+function add_data_to_table(parsed_data){
+    var data_table= $('#diagnosi_tab').DataTable();
+    data_table.clear();
+    data_table.draw();
+    $fine_risultati = $("#diagnosi_tab>tbody>tr:first-child");
+    $("#diagnosi_tab>tbody>tr:first-child").remove();
+
+    for(var i=0 ; i<parsed_data.length ; i++) {
+        $("#diagnosi_tab").find('tbody')
+            .append($('<tr>')
+                .append($('<td>')
+                    .text(parsed_data[i][0])
+                )
+                .append($('<td>')
+                    .text(parsed_data[i][1])
+                )
+            );
+
+    }
+    $("#diagnosi_tab").find('tbody').append($fine_risultati);
 }
 
 function get_source_string(event){

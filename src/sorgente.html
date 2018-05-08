@@ -24,6 +24,7 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.4.5/js/bootstrapvalidator.min.js'></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
 
 
 </head>
@@ -192,6 +193,9 @@
         $scope.search = function(sorgente) {
             var distanza = Number(document.getElementById('select_distanza').value);
             if(isNaN(distanza) == false && distanza>0) {
+                var data_table= $('#diagnosi_tab').DataTable();
+                data_table.clear();
+                data_table.draw();
                 showPleaseWait();
                 var json = {
                     'distanza': distanza,
@@ -217,6 +221,7 @@
 
 <script>
     var map;
+    var infowindow = null;
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -225,6 +230,12 @@
                 lng : 14.330291748046875
             },
             zoom : 9 // Center the map on Rome, Italy.
+        });
+
+        infowindow = new google.maps.InfoWindow();
+
+        map.data.addListener('click', function(event){
+            show_infowindow(event, infowindow, get_source_button_string(event));
         });
     }
 
@@ -337,6 +348,9 @@
             polygon_clicked_overlay.setMap(null);
         }
         polygon_clicked_overlay = new google.maps.Data(map);
+        polygon_clicked_overlay.addListener('click', function(event){
+            show_infowindow(event, infowindow, get_source_button_string(event));
+        });
         polygon_clicked_overlay.setMap(map);
         polygon_clicked_overlay.addGeoJson(poly);
         polygon_clicked_overlay.setStyle(function() {
