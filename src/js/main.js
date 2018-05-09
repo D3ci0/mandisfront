@@ -225,25 +225,26 @@ function lineari_func(checkbox_l) {
     }
 }
 
-function show_infowindow(event, infowindow, content){
+function show_infowindow(event, infowindow, source_content, diagnosis_content){
     contentString = null;
+    feature = event.feature;
     switch(event.feature.getGeometry().getType()){
         case "Polygon":{
-            contentString = content;
+            contentString = source_content;
             infowindow.setPosition(event.feature.getGeometry().getAt(0).getAt(0));
             infowindow.setContent(contentString);
             infowindow.open(map);
             break;
         }
         case "LineString":{
-            contentString = content;
+            contentString = source_content;
             infowindow.setPosition(event.feature.getGeometry().getAt(0));
             infowindow.setContent(contentString);
             infowindow.open(map);
             break;
         }
         case "Point":{
-            contentString = get_diagnosi_string(event);
+            contentString = diagnosis_content;
             infowindow.setPosition({lat: event.feature.getGeometry().get().lat(), lng: event.feature.getGeometry().get().lng()});
             infowindow.setContent(contentString);
             infowindow.open(map);
@@ -254,33 +255,43 @@ function show_infowindow(event, infowindow, content){
 }
 
 function inizializza_validator(){
-    /*$(document).ready(function() {
-        $('#ricerca_sorgenti_infowindow').bootstrapValidator({
-            feedbackIcons: {
-                valid: 'glyphicon glyphicon-ok',
-                invalid: 'glyphicon glyphicon-remove',
-                validating: 'glyphicon glyphicon-refresh'
-            },
-            fields: {
-                distanza_infowindow: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Inserisci la distanza'
-                        },
-                        numeric: {
-                            message: 'Distanza non valida'
-                        }
-                    }
-                }
-            }
-        });
-    });*/
     $.validate({lang: 'it'});
+}
+
+function get_diagnosi_button_string(event){
+    var data_diagnosi = new Date(event.feature.getProperty('data_diagnosi'));
+
+    string =    '<form id="ricerca_sorgenti_infowindow">' +
+                    '<div id="content">'+
+                        '<h3 style="font-size: small" id="firstHeading" class="firstHeading">Informazioni sulla diagnosi</h3>'+
+                        '<table class="table table-sm" style="border-bottom:none">'+
+                            '<tbody >'+
+                                '<tr>'+
+                                    '<th> Data Diagnosi </th>'+
+                                    '<td>'+ ddMMyyyyDate(data_diagnosi) +'</td>'+
+                                '</tr>'+
+                                '<tr>'+
+                                    '<th> Patologia </th>'+
+                                    '<td>'+ event.feature.getProperty('patologia') +'</td>'+
+                                '</tr>'+
+                                '<tr>'+
+                                    '<th> Tipologia </th>'+
+                                    '<td>'+ tipologia(event) +'</td>'+
+                                '</tr>'+
+                            '</tbody>'+
+                        '</table>'+
+                        '<input type = "text" class="form-control" id="select_distanza_infowindow" value="" data-validation="number" data-validation-allowing="positive" placeholder="Inserisci la distanza">'+
+                        '<button style="width: 100%; margin-top:10px" id="search_btn" class="btn btn-primary"  onclick="infowindow_sorgenti_search(); return false;">'+
+                        'Cerca'+
+                        '</button>'+
+                    '</div>'+
+                '</form>';
+
+    return string;
 }
 
 function get_source_button_string(event){
     var data_inizio = new Date(event.feature.getProperty('data_inizio'));
-    feature = event.feature;
     var data_fine = null;
     if(event.feature.getProperty('data_fine')!= null) {
         data_fine = new Date(event.feature.getProperty('data_fine'));
@@ -324,7 +335,12 @@ function export_json(){
         "properties": {}
     };
 
+    var point = {
+        "point": []
+    };
+
     var arr = [];
+
 
 
     if(feature.getGeometry().getType() == "Polygon"){
@@ -342,11 +358,49 @@ function export_json(){
             shapeFeature.geometry.coordinates.push([pt.lng(), pt.lat()]);
         }
         shapeFeature.geometry.type = "linestring";
+    }else if(feature.getGeometry().getType() == "Point"){
+        var pt = feature.getGeometry().get();
+        point.point.push(pt.lng(), pt.lat());
+        return point.point;
     }
 
     return shapeFeature;
 }
 
+function infowindow_sorgenti_search() {
+    var distanza = Number(document.getElementById('select_distanza_infowindow').value);
+    var feature_json = export_json();
+    if (isNaN(distanza) == false && distanza > 0) {
+        showPleaseWait();
+        var json = {
+            'distanza': distanza,
+            'point': feature_json
+        };
+
+        console.log(json);
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(json),
+            url: "https://floating-lowlands-19121.herokuapp.com/ricerca_sorgenti_per_diagnosi/",
+            success: function (data) {
+                console.log(JSON.parse(data));
+                sessionStorage.setItem('geojson_srcfound', data);
+                sessionStorage.setItem('residenza_paziente', json.point);
+                sessionStorage.setItem('diagnosi_data',ddMMyyyyDate(feature.getProperty('data_diagnosi')));
+                sessionStorage.setItem('diagnosi_patologia', feature.getProperty('patologia'));
+                window.location.href = '/mandisfront/src/sorgenti_trovate.html';
+                hidePleaseWait();
+                var parsed_data = JSON.parse(data);
+            },
+            error: function (err) {
+                alert(err);
+                hidePleaseWait();
+            }
+        });
+    }
+}
 function infowindow_search(){
     var distanza = Number(document.getElementById('select_distanza_infowindow').value);
     var feature_json = export_json();
@@ -356,8 +410,6 @@ function infowindow_search(){
             'distanza': distanza,
             'features': feature_json
         };
-
-        console.log(json);
 
         $.ajax({
             type : "POST",
@@ -462,15 +514,15 @@ function tipologia(event){
             if(event.feature.getProperty('raggio') != null)
                 tipologia = "Circolare";
             else
-                tipologia = "Poligonale"
+                tipologia = "Poligonale";
             break;
         }
         case "LineString":{
-            tipologia = "Lineare"
+            tipologia = "Lineare";
             break;
         }
         case "Point":{
-            tipologia = "Diagnosi"
+            tipologia = "Diagnosi";
             break;
         }
     }

@@ -24,6 +24,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
     <script src="js/main.js"></script>
 
 </head>
@@ -181,6 +182,7 @@
     var map;
     var drawingManager=null;
     var geoJson=null;
+    var infowindow = null;
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -189,6 +191,12 @@
                 lng: 14.330291748046875
             },
             zoom: 9
+        });
+
+        infowindow = new google.maps.InfoWindow();
+
+        map.data.addListener('click', function(event){
+            show_infowindow(event, infowindow, get_source_string(event), get_diagnosi_string(event));
         });
 
         drawingManager = new google.maps.drawing.DrawingManager({

@@ -235,7 +235,7 @@
         infowindow = new google.maps.InfoWindow();
 
         map.data.addListener('click', function(event){
-            show_infowindow(event, infowindow, get_source_button_string(event));
+            show_infowindow(event, infowindow, get_source_button_string(event), get_diagnosi_string(event));
         });
     }
 
@@ -294,7 +294,7 @@
             "scrollY" : "500px",
             "order" : [],
             "language": {
-                "emptyTable": "Nessun risultato"
+                "emptyTable": "Fine risultati"
             },
             "columns" : [
                 {
@@ -318,7 +318,7 @@
             "scrollY" : "500px",
             "order" : [],
             "language": {
-                "emptyTable": "Nessun risultato"
+                "emptyTable": "Fine risultati"
             },
             "columns" : [ {
                 "name" : "Data Inizio",
